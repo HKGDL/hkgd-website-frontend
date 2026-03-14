@@ -1,0 +1,122 @@
+import type { Level } from '@/types';
+import { ExternalLink, Trophy } from 'lucide-react';
+
+interface LevelCardProps {
+  level: Level;
+  allLevels: Level[]; // Add allLevels prop to calculate sequential rank
+  onClick: () => void;
+}
+
+export function LevelCard({ level, allLevels, onClick }: LevelCardProps) {
+  // Calculate sequential HKGD rank based on AREDL ranking
+  const calculateHkgdRank = (currentLevel: Level): number => {
+    const levelsWithAredl = allLevels.filter(l => l.aredlRank !== null);
+    const sortedByAredl = levelsWithAredl.sort((a, b) => (a.aredlRank || 9999) - (b.aredlRank || 9999));
+    return sortedByAredl.findIndex(l => l.id === currentLevel.id) + 1;
+  };
+
+  const hkgdRank = level.aredlRank ? calculateHkgdRank(level) : level.hkgdRank;
+
+  return (
+    <div
+      onClick={onClick}
+      className="group relative bg-card rounded-xl overflow-hidden border border-border/50 cursor-pointer card-hover active:scale-[0.98] transition-transform"
+    >
+      {/* Rank Badge - Mobile optimized */}
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <span className="text-base sm:text-xl font-bold text-white">#{hkgdRank}</span>
+          </div>
+          <div className="hidden sm:block px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
+            <span className="text-xs text-muted-foreground">
+              {level.tags.some(tag => tag.toLowerCase() === 'platformer')
+                ? (level.pemonlistRank
+                    ? `Pemonlist #${level.pemonlistRank}`
+                    : 'HKGD')
+                : (level.aredlRank
+                    ? `AREDL #${level.aredlRank}`
+                    : 'HKGD')}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Thumbnail */}
+      <div className="relative aspect-video overflow-hidden">
+        {level.thumbnail ? (
+          <img
+            src={level.thumbnail}
+            alt={level.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-indigo-950 to-purple-950 flex items-center justify-center">
+            <Trophy className="w-12 h-12 sm:w-16 sm:h-16 text-indigo-500/30" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="p-3 sm:p-5">
+        <h3 className="text-base sm:text-xl font-bold text-foreground mb-1 sm:mb-2 group-hover:text-indigo-400 transition-colors line-clamp-1 sm:line-clamp-2">
+          {level.name}
+        </h3>
+
+        {/* Description - only for Classic levels - Hidden on mobile */}
+        {level.description && !level.tags.some(tag => tag.toLowerCase() === 'platformer') && (
+          <p className="hidden sm:block text-sm text-muted-foreground line-clamp-2 mb-4">
+            {level.description}
+          </p>
+        )}
+
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 sm:mb-4">
+          <span className="shrink-0">Creator:</span>
+          <p className="font-medium text-foreground truncate">{level.creator}</p>
+        </div>
+
+        {/* Tags - Reduced on mobile */}
+        <div className="flex flex-wrap gap-1 sm:gap-2">
+          {level.tags.slice(0, 2).map((tag) => (
+            <span
+              key={tag}
+              className="px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-xs rounded-md bg-muted text-muted-foreground border border-border/50"
+            >
+              {tag}
+            </span>
+          ))}
+          {level.tags.length > 2 && (
+            <span className="px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-xs rounded-md bg-muted text-muted-foreground border border-border/50">
+              +{level.tags.length - 2}
+            </span>
+          )}
+        </div>
+
+        {/* Record Count */}
+        {level.records.length > 0 && (
+          <div className={`mt-2 sm:mt-3 p-2 sm:p-3 rounded-lg ${level.tags.some(tag => tag.toLowerCase() === 'platformer') ? 'bg-purple-500/10 border border-purple-500/20' : 'bg-indigo-500/10 border border-indigo-500/20'}`}>
+            <div className="flex items-center gap-2">
+              <Trophy className={`w-3 h-3 sm:w-4 sm:h-4 ${level.tags.some(tag => tag.toLowerCase() === 'platformer') ? 'text-purple-400' : 'text-indigo-400'}`} />
+              <div>
+                <span className={`text-[10px] uppercase tracking-wider ${level.tags.some(tag => tag.toLowerCase() === 'platformer') ? 'text-purple-400' : 'text-indigo-400'}`}>
+                  {level.records.length} {level.records.length === 1 ? 'Record' : 'Records'}
+                </span>
+                <p className="font-semibold text-foreground text-xs sm:text-sm">
+                  {level.records.map(r => r.player).join(', ')}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Level ID - Hidden on mobile */}
+        <div className="hidden sm:flex mt-4 pt-4 border-t border-border/50 items-center justify-between">
+          <span className="text-xs text-muted-foreground">ID: {level.levelId}</span>
+          <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-indigo-400 transition-colors" />
+        </div>
+      </div>
+    </div>
+  );
+}

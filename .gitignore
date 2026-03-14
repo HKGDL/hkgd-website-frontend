@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+frontend/dist/
+
+# Environment files
+api/.env
+
+# Database
+api/hkgd.db
+api/hkgd.db-shm
+api/hkgd.db-wal
+
+# SSL certificates
+api/certs/
+
+# Logs
+api/logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

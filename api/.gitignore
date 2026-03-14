@@ -1,0 +1,21 @@
+# Environment variables
+.env
+
+# Database files
+hkgd.db
+hkgd.db-shm
+hkgd.db-wal
+
+# SSL certificates
+certs/
+
+# Logs
+logs/
+*.log
+
+# Node modules
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
