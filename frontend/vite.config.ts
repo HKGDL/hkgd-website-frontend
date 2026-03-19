@@ -18,24 +18,24 @@ export default defineConfig({
     host: '0.0.0.0',
     strictPort: false,
     https: {
-      key: fs.readFileSync(path.resolve(__dirname, '../api/certs/key.pem')),
-      cert: fs.readFileSync(path.resolve(__dirname, '../api/certs/cert.pem'))
+      key: fs.readFileSync(path.resolve(__dirname, '../../api/certs/key.pem')),
+      cert: fs.readFileSync(path.resolve(__dirname, '../../api/certs/cert.pem'))
     },
-    allowedHosts: ['hkgdl.ddns.net', 'localhost', '.ddns.net'],
+    allowedHosts: ['hkgdl.ddns.net', 'localhost'],
     hmr: {
       host: 'hkgdl.ddns.net',
       port: 5173,
       clientPort: 443,
-      protocol: 'wss', // Use secure WebSocket for HTTPS
+      protocol: 'wss',
     },
     watch: {
       usePolling: true,
     },
     proxy: {
       '/api': {
-        target: 'https://localhost:8081', // API server on 8081
+        target: 'https://localhost:8081',
         changeOrigin: true,
-        secure: false, // Accept self-signed certificates in development
+        secure: false,
       }
     }
   }
