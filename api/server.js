@@ -135,7 +135,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https://i.ytimg.com", "https://*.discordapp.net"],
+      imgSrc: ["'self'", "data:", "https://i.ytimg.com", "https://*.discordapp.net", "https://levelthumbs.prevter.me"],
       connectSrc: ["'self'", "https://api.aredl.net", "https://pemonlist.com"],
       frameSrc: ["'self'", "https://www.youtube.com"],
       fontSrc: ["'self'", "data:"],

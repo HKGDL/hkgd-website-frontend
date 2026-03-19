@@ -1,6 +1,6 @@
 // API base URL configuration
 // In production: use environment variable VITE_API_URL or relative /api
-// In development: use VITE_API_URL or default to localhost:19132
+// In development: use VITE_API_URL or default to localhost:8081
 const getApiBaseUrl = () => {
   // Check for environment variable first
   const envApiUrl = import.meta.env.VITE_API_URL;
@@ -14,7 +14,7 @@ const getApiBaseUrl = () => {
   }
 
   // Development: default to localhost API server
-  return 'http://localhost:19132/api';
+  return 'https://localhost:8081/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
