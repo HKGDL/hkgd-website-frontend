@@ -2,6 +2,18 @@
 module.exports = {
   darkMode: ["class"],
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  safelist: [
+    // April Fools prank colors
+    'bg-gray-900', 'bg-gray-800', 'bg-gray-700', 'bg-gray-600', 'bg-gray-500',
+    'bg-black/50',
+    'text-red-500', 'text-yellow-400', 'text-green-500', 'text-gray-300', 'text-gray-400', 'text-gray-500',
+    'text-white',
+    'border-gray-700',
+    'from-green-500', 'to-blue-500',
+    'from-purple-500', 'to-pink-500',
+    'from-purple-600', 'to-pink-600',
+    'hover:bg-gray-500', 'hover:bg-red-600',
+  ],
   theme: {
     extend: {
       colors: {

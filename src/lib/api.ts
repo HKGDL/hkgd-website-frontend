@@ -1,6 +1,6 @@
 // API base URL configuration
-// In production: use environment variable VITE_API_URL or relative /api
-// In development: use VITE_API_URL or default to localhost:8081
+// Always use relative /api path since Vite proxies /api in dev
+// and production server serves both frontend and API from same origin
 const getApiBaseUrl = () => {
   // Check for environment variable first
   const envApiUrl = import.meta.env.VITE_API_URL;
@@ -8,13 +8,8 @@ const getApiBaseUrl = () => {
     return envApiUrl;
   }
 
-  if (import.meta.env.PROD) {
-    // Production: use relative path (same origin)
-    return '/api';
-  }
-
-  // Development: default to localhost API server
-  return 'https://localhost:8081/api';
+  // Always use relative path - works for both dev (via Vite proxy) and production
+  return '/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();

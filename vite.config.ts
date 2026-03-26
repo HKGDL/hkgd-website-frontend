@@ -18,8 +18,8 @@ export default defineConfig({
     host: '0.0.0.0',
     strictPort: false,
     https: {
-      key: fs.readFileSync(path.resolve(__dirname, '../../api/certs/key.pem')),
-      cert: fs.readFileSync(path.resolve(__dirname, '../../api/certs/cert.pem'))
+      key: fs.readFileSync(path.resolve(__dirname, './certs/key.pem')),
+      cert: fs.readFileSync(path.resolve(__dirname, './certs/cert.pem'))
     },
     allowedHosts: ['hkgdl.ddns.net', 'localhost'],
     hmr: {

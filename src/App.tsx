@@ -7,6 +7,7 @@ import { Footer } from '@/components/Footer';
 import { AdminCMSRefactored as AdminCMS } from '@/components/admin/AdminCMSRefactored';
 import { SubmitRecord } from '@/components/SubmitRecord';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { AprilFoolsPrank } from '@/components/AprilFoolsPrank';
 import { defaultContent, loadContent } from '@/data/content';
 import { api } from '@/lib/api';
 import type { Level, ChangelogEntry, Member, Record, PendingSubmission, WebsiteContent } from '@/types';
@@ -177,62 +178,64 @@ if (isLoading) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header 
-        onNavigate={handleNavigate} 
-        currentPage={currentPage} 
-        onSubmitRecord={() => setIsSubmitOpen(true)}
-        onOpenAdmin={() => setIsAdminOpen(true)}
-      />
-      
-      <main className={currentPage === 'home' ? 'min-h-screen' : 'pt-20 min-h-screen'}>
-        {renderContent()}
-      </main>
-
-      <Footer content={content.footer} />
-
-      {/* Prerelease Alert */}
-      <AlertDialog open={showPrerelease} onOpenChange={setShowPrerelease}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>🚀 HKGD Website - Prerelease</AlertDialogTitle>
-            <AlertDialogDescription>
-              Welcome to the HKGD website! This is currently in prerelease mode. Features and content are still being developed and may change. Thank you for your patience and support!
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowPrerelease(false)}>
-              Got it!
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Admin CMS */}
-      {isAdminOpen && (
-        <AdminCMS
-          levels={levels}
-          members={members}
-          changelog={changelog}
-          pendingSubmissions={pendingSubmissions}
-          onUpdateLevels={handleUpdateLevels}
-          onUpdateMembers={handleUpdateMembers}
-          onUpdateChangelog={handleUpdateChangelog}
-          onUpdatePending={handleUpdatePending}
-          onReloadData={loadAllData}
-          onClose={() => setIsAdminOpen(false)}
+    <AprilFoolsPrank>
+      <div className="min-h-screen bg-background">
+        <Header 
+          onNavigate={handleNavigate} 
+          currentPage={currentPage} 
+          onSubmitRecord={() => setIsSubmitOpen(true)}
+          onOpenAdmin={() => setIsAdminOpen(true)}
         />
-      )}
+        
+        <main className={currentPage === 'home' ? 'min-h-screen' : 'pt-20 min-h-screen'}>
+          {renderContent()}
+        </main>
 
-      {/* Submit Record Modal */}
-      {isSubmitOpen && (
-        <SubmitRecord
-          levels={levels}
-          onSubmit={handleSubmitRecord}
-          onClose={() => setIsSubmitOpen(false)}
-        />
-      )}
-    </div>
+        <Footer content={content.footer} />
+
+        {/* Prerelease Alert */}
+        <AlertDialog open={showPrerelease} onOpenChange={setShowPrerelease}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>🚀 HKGD Website - Prerelease</AlertDialogTitle>
+              <AlertDialogDescription>
+                Welcome to the HKGD website! This is currently in prerelease mode. Features and content are still being developed and may change. Thank you for your patience and support!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => setShowPrerelease(false)}>
+                Got it!
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Admin CMS */}
+        {isAdminOpen && (
+          <AdminCMS
+            levels={levels}
+            members={members}
+            changelog={changelog}
+            pendingSubmissions={pendingSubmissions}
+            onUpdateLevels={handleUpdateLevels}
+            onUpdateMembers={handleUpdateMembers}
+            onUpdateChangelog={handleUpdateChangelog}
+            onUpdatePending={handleUpdatePending}
+            onReloadData={loadAllData}
+            onClose={() => setIsAdminOpen(false)}
+          />
+        )}
+
+        {/* Submit Record Modal */}
+        {isSubmitOpen && (
+          <SubmitRecord
+            levels={levels}
+            onSubmit={handleSubmitRecord}
+            onClose={() => setIsSubmitOpen(false)}
+          />
+        )}
+      </div>
+    </AprilFoolsPrank>
   );
 }
 
