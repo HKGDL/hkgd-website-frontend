@@ -35,7 +35,7 @@ const maintenanceReasons = [
   "Server discovered it's actually a toaster",
   "Physics engine is having a bad day",
   "The AI achieved sentience and quit",
-  "Keyboard cat is taking a nap on the server",
+  "Keyboard cat is taking a NAP on the server",
   "Server is buffering... life choices",
   "Unexpected item in bagging area",
   "The cloud has been grounded",
