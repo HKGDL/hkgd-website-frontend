@@ -72,4 +72,4 @@ The build output will be in the `dist` folder.
 
 ## License
 
-ISC
+[Dont Be A Dick (DBAD) Public License](DBAD.md)
