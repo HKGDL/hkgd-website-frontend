@@ -8,6 +8,8 @@ import { PendingSubmissions } from './PendingSubmissions';
 import { AREDLSync } from './AREDLSync';
 import { LevelManagement } from './LevelManagement';
 import { ChangelogManagement } from './ChangelogManagement';
+import { EditLevelModal } from './EditLevelModal';
+import { AddLevelModal } from './AddLevelModal';
 import type { Level, Member, ChangelogEntry, PendingSubmission } from '@/types';
 import { api } from '@/lib/api';
 
@@ -52,6 +54,12 @@ export function AdminCMSRefactored({
   const [platformerSearchQuery, setPlatformerSearchQuery] = useState('');
   const [platformerSearchResults, setPlatformerSearchResults] = useState<any[]>([]);
   const [isSearchingPlatformer, setIsSearchingPlatformer] = useState(false);
+
+  // Edit level state
+  const [editingLevel, setEditingLevel] = useState<Level | null>(null);
+
+  // Add level state
+  const [showAddLevel, setShowAddLevel] = useState(false);
 
   // Save active tab to localStorage when it changes
   useEffect(() => {
@@ -274,7 +282,7 @@ export function AdminCMSRefactored({
   };
 
   const handleAddLevel = () => {
-    alert('Add level functionality - to be implemented');
+    setShowAddLevel(true);
   };
 
   const handleAddPlatformerLevel = async (pemonlistLevel: any) => {
@@ -324,7 +332,21 @@ export function AdminCMSRefactored({
   };
 
   const handleEditLevel = (level: Level) => {
-    alert(`Edit level: ${level.name} - to be implemented`);
+    setEditingLevel(level);
+  };
+
+  const handleSaveLevel = async (updatedLevel: Level) => {
+    // Update the level in the local state
+    const updatedLevels = levels.map(l => 
+      l.id === updatedLevel.id ? updatedLevel : l
+    );
+    onUpdateLevels(updatedLevels);
+    setEditingLevel(null);
+  };
+
+  const handleLevelDeleted = async () => {
+    // Refresh the levels list
+    await onReloadData();
   };
 
   const handleDeleteLevel = async (levelId: string) => {
@@ -459,6 +481,25 @@ export function AdminCMSRefactored({
           </ScrollArea>
         </Tabs>
       </div>
+
+      {/* Edit Level Modal */}
+      {editingLevel && (
+        <EditLevelModal
+          level={editingLevel}
+          onClose={() => setEditingLevel(null)}
+          onSave={handleSaveLevel}
+          onDeleted={handleLevelDeleted}
+        />
+      )}
+
+      {/* Add Level Modal */}
+      {showAddLevel && (
+        <AddLevelModal
+          levels={levels}
+          onClose={() => setShowAddLevel(false)}
+          onAdded={onReloadData}
+        />
+      )}
     </div>
   );
 }

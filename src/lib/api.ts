@@ -162,6 +162,24 @@ export const api = {
     return response.json();
   },
 
+  updateRecord: async (recordId: number, record: any) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/records/${recordId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record),
+    });
+    if (!response.ok) throw new Error('Failed to update record');
+    return response.json();
+  },
+
+  deleteRecord: async (recordId: number) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/records/${recordId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete record');
+    return response.json();
+  },
+
   // Members
   getMembers: async () => {
     const response = await fetchWithTimeout(`${API_BASE_URL}/members`);

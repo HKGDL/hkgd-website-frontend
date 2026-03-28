@@ -20,6 +20,7 @@ export interface Level {
 }
 
 export interface Record {
+  id?: number;
   player: string;
   date: string;
   videoUrl?: string;
