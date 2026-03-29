@@ -76,7 +76,6 @@ export function Hero({ content, levels, onViewList }: HeroProps) {
             className="bg-transparent hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 hover:border-indigo-400 px-6 py-4 sm:px-8 sm:py-6 text-base sm:text-lg font-semibold rounded-xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 w-full sm:w-auto"
           >
             {content.ctaButton}
-            <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
           </Button>
         </div>
 
