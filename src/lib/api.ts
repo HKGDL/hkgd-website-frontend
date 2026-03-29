@@ -259,4 +259,21 @@ export const api = {
     if (!response.ok) throw new Error('Failed to sync AREDL');
     return response.json();
   },
+
+  // Settings
+  getSettings: async () => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/settings`);
+    if (!response.ok) throw new Error('Failed to fetch settings');
+    return response.json();
+  },
+
+  updateSetting: async (key: string, value: boolean) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/settings/${key}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value }),
+    });
+    if (!response.ok) throw new Error('Failed to update setting');
+    return response.json();
+  },
 };

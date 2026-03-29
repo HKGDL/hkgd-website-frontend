@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Lock, Settings, Trophy, Users, List, RefreshCw, LogOut, History, ChevronDown } from 'lucide-react';
+import { X, Lock, Settings, Trophy, Users, List, RefreshCw, LogOut, History, ChevronDown, Sliders } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,6 +8,7 @@ import { PendingSubmissions } from './PendingSubmissions';
 import { AREDLSync } from './AREDLSync';
 import { LevelManagement } from './LevelManagement';
 import { ChangelogManagement } from './ChangelogManagement';
+import { SettingsManagement } from './SettingsManagement';
 import { EditLevelModal } from './EditLevelModal';
 import { AddLevelModal } from './AddLevelModal';
 import type { Level, Member, ChangelogEntry, PendingSubmission } from '@/types';
@@ -43,9 +44,9 @@ export function AdminCMSRefactored({
   const [isBanned, setIsBanned] = useState(false);
   const [banRemainingTime, setBanRemainingTime] = useState<number>();
   const [attemptsRemaining, setAttemptsRemaining] = useState<number>(5);
-  const [activeTab, setActiveTab] = useState<'classic-levels' | 'platformer-levels' | 'pending' | 'sync' | 'changelog'>(() => {
+  const [activeTab, setActiveTab] = useState<'classic-levels' | 'platformer-levels' | 'pending' | 'sync' | 'changelog' | 'settings'>(() => {
     const savedTab = localStorage.getItem('admin-active-tab');
-    return (savedTab === 'classic-levels' || savedTab === 'platformer-levels' || savedTab === 'pending' || savedTab === 'sync' || savedTab === 'changelog')
+    return (savedTab === 'classic-levels' || savedTab === 'platformer-levels' || savedTab === 'pending' || savedTab === 'sync' || savedTab === 'changelog' || savedTab === 'settings')
       ? savedTab
       : 'classic-levels';
   });
@@ -438,6 +439,12 @@ export function AdminCMSRefactored({
                   AREDL Sync
                 </div>
               </SelectItem>
+              <SelectItem value="settings">
+                <div className="flex items-center gap-2">
+                  <Sliders className="w-4 h-4" />
+                  Settings
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -491,6 +498,10 @@ export function AdminCMSRefactored({
 
             {activeTab === 'sync' && (
               <AREDLSync onSync={handleSyncAREDL} />
+            )}
+
+            {activeTab === 'settings' && (
+              <SettingsManagement />
             )}
           </div>
         </ScrollArea>
