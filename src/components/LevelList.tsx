@@ -140,6 +140,17 @@ export function LevelList({ levels, listPage, changelog }: LevelListProps) {
                   List Statistics
                 </h3>
                 <div className="space-y-4">
+                  {/* Total Records */}
+                  <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                    <div className="text-xs text-green-400 uppercase tracking-wider mb-2">Total Completions</div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">All Records</span>
+                      <span className="text-sm font-semibold text-foreground">
+                        {levels.reduce((acc, level) => acc + (level.records?.length || 0), 0)}
+                      </span>
+                    </div>
+                  </div>
+
                   {/* Classic Demons */}
                   <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
                     <div className="text-xs text-indigo-400 uppercase tracking-wider mb-2">Classic Demons</div>
