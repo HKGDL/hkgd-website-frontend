@@ -36,8 +36,18 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout 
 
 // Helper function to make authenticated requests
 async function authenticatedFetch(url: string, options: RequestInit = {}) {
+  const token = localStorage.getItem('hkgd_admin_token');
+  const headers: Record<string, string> = {
+    ...(options.headers as Record<string, string> || {}),
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
   return fetchWithTimeout(url, {
     ...options,
+    headers,
     credentials: 'include', // Include cookies for authentication
   });
 }
@@ -52,11 +62,15 @@ export const api = {
       body: JSON.stringify({ password }),
     });
     const data = await response.json();
-    // Token is now stored in httpOnly cookie by the server
+    // Store token in localStorage for authenticated requests
+    if (data.success && data.token) {
+      localStorage.setItem('hkgd_admin_token', data.token);
+    }
     return data;
   },
 
   logout: async () => {
+    localStorage.removeItem('hkgd_admin_token');
     const response = await fetchWithTimeout(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
       credentials: 'include',
@@ -65,8 +79,15 @@ export const api = {
   },
 
   verifyToken: async () => {
+    const token = localStorage.getItem('hkgd_admin_token');
+    if (!token) {
+      return { success: false };
+    }
     const response = await fetchWithTimeout(`${API_BASE_URL}/auth/verify`, {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
       credentials: 'include',
     });
     return response.json();
