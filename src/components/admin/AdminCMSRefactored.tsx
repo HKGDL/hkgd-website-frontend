@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, Lock, Settings, Trophy, Users, List, RefreshCw, LogOut, History } from 'lucide-react';
+import { X, Lock, Settings, Trophy, Users, List, RefreshCw, LogOut, History, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AdminAuth } from './AdminAuth';
 import { PendingSubmissions } from './PendingSubmissions';
 import { AREDLSync } from './AREDLSync';
@@ -401,85 +401,99 @@ export function AdminCMSRefactored({
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="w-full">
-          <div className="px-6 pt-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="classic-levels">
-                <List className="w-4 h-4 mr-2" />
-                Classic
-              </TabsTrigger>
-              <TabsTrigger value="platformer-levels">
-                <List className="w-4 h-4 mr-2" />
-                Platformer
-              </TabsTrigger>
-              <TabsTrigger value="pending">
-                <Users className="w-4 h-4 mr-2" />
-                Pending
-              </TabsTrigger>
-              <TabsTrigger value="changelog">
-                <History className="w-4 h-4 mr-2" />
-                Changelog
-              </TabsTrigger>
-              <TabsTrigger value="sync">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Sync
-              </TabsTrigger>
-            </TabsList>
+        {/* Dropdown for tab selection */}
+        <div className="px-6 pt-6">
+          <Select value={activeTab} onValueChange={(v: any) => setActiveTab(v)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a section" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="classic-levels">
+                <div className="flex items-center gap-2">
+                  <List className="w-4 h-4" />
+                  Classic Levels
+                </div>
+              </SelectItem>
+              <SelectItem value="platformer-levels">
+                <div className="flex items-center gap-2">
+                  <List className="w-4 h-4" />
+                  Platformer Levels
+                </div>
+              </SelectItem>
+              <SelectItem value="pending">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Pending Submissions
+                </div>
+              </SelectItem>
+              <SelectItem value="changelog">
+                <div className="flex items-center gap-2">
+                  <History className="w-4 h-4" />
+                  Changelog
+                </div>
+              </SelectItem>
+              <SelectItem value="sync">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4" />
+                  AREDL Sync
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <ScrollArea className="h-[calc(90vh-140px)]">
+          <div className="p-6">
+            {activeTab === 'classic-levels' && (
+              <LevelManagement
+                levels={levels.filter(l => l.aredlRank !== null)}
+                onAddLevel={handleAddLevel}
+                onEditLevel={handleEditLevel}
+                onDeleteLevel={handleDeleteLevel}
+                listType="classic"
+              />
+            )}
+
+            {activeTab === 'platformer-levels' && (
+              <LevelManagement
+                levels={levels.filter(l => l.aredlRank === null)}
+                onAddLevel={handleAddLevel}
+                onEditLevel={handleEditLevel}
+                onDeleteLevel={handleDeleteLevel}
+                listType="platformer"
+                onAddPlatformerLevel={handleAddPlatformerLevel}
+                platformerSearchQuery={platformerSearchQuery}
+                onPlatformerSearchChange={setPlatformerSearchQuery}
+                platformerSearchResults={platformerSearchResults}
+                isSearchingPlatformer={isSearchingPlatformer}
+              />
+            )}
+
+            {activeTab === 'pending' && (
+              <PendingSubmissions
+                submissions={pendingSubmissions}
+                levels={levels}
+                onApprove={handleApproveSubmission}
+                onReject={handleRejectSubmission}
+                onApproveAll={handleApproveAll}
+                onRejectAll={handleRejectAll}
+              />
+            )}
+
+            {activeTab === 'changelog' && (
+              <ChangelogManagement
+                changelog={changelog}
+                onAddEntry={handleAddChangelogEntry}
+                onDeleteEntry={handleDeleteChangelogEntry}
+                onClearAll={handleClearChangelog}
+              />
+            )}
+
+            {activeTab === 'sync' && (
+              <AREDLSync onSync={handleSyncAREDL} />
+            )}
           </div>
-
-          <ScrollArea className="h-[calc(90vh-140px)]">
-            <div className="p-6">
-              <TabsContent value="classic-levels">
-                <LevelManagement
-                  levels={levels.filter(l => l.aredlRank !== null)}
-                  onAddLevel={handleAddLevel}
-                  onEditLevel={handleEditLevel}
-                  onDeleteLevel={handleDeleteLevel}
-                  listType="classic"
-                />
-              </TabsContent>
-
-              <TabsContent value="platformer-levels">
-                <LevelManagement
-                  levels={levels.filter(l => l.aredlRank === null)}
-                  onAddLevel={handleAddLevel}
-                  onEditLevel={handleEditLevel}
-                  onDeleteLevel={handleDeleteLevel}
-                  listType="platformer"
-                  onAddPlatformerLevel={handleAddPlatformerLevel}
-                  platformerSearchQuery={platformerSearchQuery}
-                  onPlatformerSearchChange={setPlatformerSearchQuery}
-                  platformerSearchResults={platformerSearchResults}
-                  isSearchingPlatformer={isSearchingPlatformer}
-                />
-              </TabsContent>
-
-              <TabsContent value="pending">
-                <PendingSubmissions
-                  submissions={pendingSubmissions}
-                  levels={levels}
-                  onApprove={handleApproveSubmission}
-                  onReject={handleRejectSubmission}
-                  onApproveAll={handleApproveAll}
-                  onRejectAll={handleRejectAll}
-                />
-              </TabsContent>
-
-              <TabsContent value="changelog">
-                <ChangelogManagement
-                  changelog={changelog}
-                  onAddEntry={handleAddChangelogEntry}
-                  onDeleteEntry={handleDeleteChangelogEntry}
-                  onClearAll={handleClearChangelog}
-                />
-              </TabsContent>
-
-              <TabsContent value="sync">
-                <AREDLSync onSync={handleSyncAREDL} />
-              </TabsContent>
-            </div>
-          </ScrollArea>
-        </Tabs>
+        </ScrollArea>
       </div>
 
       {/* Edit Level Modal */}
