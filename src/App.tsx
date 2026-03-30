@@ -155,7 +155,7 @@ const handleSubmitRecord = async (levelId: string, record: Record, levelData?: P
     switch (currentPage) {
       case 'home':
         return (
-          <Hero content={content.hero} levels={levels} onViewList={() => handleNavigate('list')} />
+          <Hero content={content.hero} levels={levels} />
         );
       case 'list':
         return <LevelList levels={levels} listPage={content.listPage} changelog={changelog} />;

@@ -1,14 +1,12 @@
 import { Skull, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import type { WebsiteContent, Level, Member } from '@/types';
 
 interface HeroProps {
   content: WebsiteContent['hero'];
   levels: Level[];
-  onViewList: () => void;
 }
 
-export function Hero({ content, levels, onViewList }: HeroProps) {
+export function Hero({ content, levels }: HeroProps) {
   // Separate classic and platformer levels
   const classicLevels = levels.filter(level => !level.tags.includes('Platformer'));
   const platformerLevels = levels.filter(level => level.tags.includes('Platformer'));
@@ -66,17 +64,6 @@ export function Hero({ content, levels, onViewList }: HeroProps) {
           <p className="text-xs sm:text-sm text-muted-foreground">
             Rankings are based on AREDL positions. Your opinions may differ.
           </p>
-        </div>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
-          <Button
-            size="lg"
-            onClick={onViewList}
-            className="bg-transparent hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 hover:border-indigo-400 px-6 py-4 sm:px-8 sm:py-6 text-base sm:text-lg font-semibold rounded-xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 w-full sm:w-auto"
-          >
-            {content.ctaButton}
-          </Button>
         </div>
 
         {/* Stats */}
