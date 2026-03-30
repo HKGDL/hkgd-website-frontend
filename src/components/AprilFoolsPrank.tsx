@@ -1,46 +1,37 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { Skull, Zap, AlertTriangle, Sparkles } from 'lucide-react';
 
 const maintenanceReasons = [
-  "Server is upgrading to a newer version of Node.js",
-  "Database migration in progress",
-  "SSL certificates are being renewed",
-  "Our hamster wheels need more hamsters",
-  "Server is learning to speak fluent JavaScript",
-  "Backend is taking a coffee break",
-  "Quantum computer recalibration in progress",
-  "Server is having an existential crisis",
-  "Cloud storage is experiencing heavy rain",
-  "Packet loss recovery mode activated",
-  "Server is being held hostage by bugs",
-  "CPU needs more coffee beans",
-  "Memory modules are meditating",
-  "DNS server forgot its own name",
-  "Server is at the gym working on its uptime",
-  "Developer fell asleep on the keyboard",
-  "Ran out of Internets, ordering more",
-  "Server caught a virus (the flu kind)",
-  "Windows Update decided now is a good time",
-  "The algorithm is feeling emotional today",
-  "Bit flips causing personality changes",
-  "Server went to get milk, will be back soon",
-  "Electricity bills weren't paid (just kidding... maybe)",
-  "The rubber duck is on strike",
-  "Server is questioning its life choices",
-  "Ran out of semicolons, restocking",
-  "Someone pushed to production on Friday",
+  "Syncing with the demon portal...",
+  "Recalibrating difficulty rankings...",
+  "The verifier is taking a coffee break...",
+  "Upgrading to Geometry Dash 3.0... just kidding",
+  "Server is attempting Bloodlust...",
+  "Hamster-powered CPU needs more hamsters",
+  "Quantum demon physics recalibration",
+  "Server is questioning its AREDL ranking",
+  "Cloud storage experiencing heavy demon energy",
+  "CPU went to practice timings",
+  "Server got stuck on a wave part",
+  "Memory modules are buffering a recording",
+  "DNS server forgot its click pattern",
+  "Server is grinding for stars",
+  "Developer fell asleep during verification",
+  "Ran out of attempts, starting over...",
+  "Server is having an existential crisis on level 1",
+  "Someone pushed to production on April 1st",
   "Cache invalidation gone wrong (classic)",
-  "Server is watching paint dry for inspiration",
-  "Binary gods demand a sacrifice",
-  "The cable guy is fixing... something",
-  "Server discovered it's actually a toaster",
-  "Physics engine is having a bad day",
-  "The AI achieved sentience and quit",
-  "Keyboard cat is taking a nap on the server",
-  "Server is buffering... life choices",
-  "Unexpected item in bagging area",
-  "The cloud has been grounded",
-  "Server is in a meeting that could've been an email",
-  "Developer is debugging the debugger",
+  "Server is watching a vibing level for inspiration",
+  "Binary gods demand more FPS",
+  "The rubber duck quit the team",
+  "Server discovered it's actually a platformer",
+  "Keyboard cat is beating the demon list",
+  "Server is questioning its skill issue",
+  "Ran out of nervs, restocking",
+  "Unexpected nerf in the gameplay",
+  "Server is stuck at 98%... again",
+  "Physics engine hit a spike",
+  "The AI achieved sentience and started playing GD",
 ];
 
 export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
@@ -80,7 +71,7 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
       const container = containerRef.current;
       setButtonPos({
         x: container.offsetWidth / 2 - 60,
-        y: container.offsetHeight - 60
+        y: container.offsetHeight - 80
       });
     }
   }, [isEnabled]);
@@ -89,11 +80,11 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
     if (!containerRef.current) return;
     
     const container = containerRef.current;
-    const btnWidth = 120;
-    const btnHeight = 32;
+    const btnWidth = 140;
+    const btnHeight = 40;
     
-    const maxX = container.offsetWidth - btnWidth - 10;
-    const maxY = container.offsetHeight - btnHeight - 60;
+    const maxX = container.offsetWidth - btnWidth - 20;
+    const maxY = container.offsetHeight - btnHeight - 80;
     
     const newX = Math.random() * maxX;
     const newY = Math.random() * maxY;
@@ -131,20 +122,30 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
 
   if (showWinnerMessage) {
     return (
-      <div className="fixed inset-0 bg-gray-900 flex items-center justify-center z-[9999]">
-        <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 max-w-md w-full mx-4 text-center shadow-2xl">
-          <div className="text-6xl mb-4">😱</div>
-          <h1 className="text-3xl font-bold text-green-500 mb-4">NO NO NO</h1>
-          <h2 className="text-2xl text-yellow-400 mb-4">THIS IS NOT FAIR...</h2>
-          <p className="text-gray-300 mb-6">NO NO NO IT IS NOT FAIR</p>
+      <div className="fixed inset-0 bg-background flex items-center justify-center z-[9999] overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+        
+        <div className="relative z-10 bg-card/80 backdrop-blur-xl border border-indigo-500/30 rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl shadow-indigo-500/20">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
+            <Zap className="w-8 h-8 text-yellow-400" />
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-2">
+            Wait What?!
+          </h1>
+          <h2 className="text-xl text-yellow-400 mb-4">You actually clicked it?!</h2>
+          <p className="text-muted-foreground mb-6">Fine, you win this round. The demons await...</p>
           <button
             onClick={() => {
               setShowWinnerMessage(false);
               setShowPrank(false);
             }}
-            className="px-6 py-3 bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold rounded-lg"
+            className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-lg shadow-indigo-500/25"
           >
-            Buton To Hell...
+            Enter the Demon List
           </button>
         </div>
       </div>
@@ -153,20 +154,29 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
 
   if (showLoserMessage) {
     return (
-      <div className="fixed inset-0 bg-gray-900 flex items-center justify-center z-[9999]">
-        <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 max-w-md w-full mx-4 text-center shadow-2xl">
-          <div className="text-6xl mb-4">🤡</div>
-          <h1 className="text-3xl font-bold text-red-500 mb-4">LMAO</h1>
-          <h2 className="text-2xl text-white mb-4">Server 1 : 0 You</h2>
-          <p className="text-gray-300 mb-6">You gave up after {attempts} attempts. The server wins this round!</p>
+      <div className="fixed inset-0 bg-background flex items-center justify-center z-[9999] overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-red-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+        
+        <div className="relative z-10 bg-card/80 backdrop-blur-xl border border-red-500/30 rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl shadow-red-500/20">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-red-500/20 to-orange-500/20 mb-4">
+            <Skull className="w-8 h-8 text-red-400" />
+          </div>
+          <h1 className="text-3xl font-bold text-red-400 mb-2">Skill Issue Detected</h1>
+          <h2 className="text-xl text-muted-foreground mb-4">Server 1 - 0 You</h2>
+          <p className="text-muted-foreground mb-2">You gave up after {attempts} attempts.</p>
+          <p className="text-sm text-muted-foreground mb-6">The demons would be disappointed...</p>
           <button
             onClick={() => {
               setShowLoserMessage(false);
               setShowPrank(false);
             }}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg"
+            className="px-6 py-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 text-red-300 font-semibold rounded-xl hover:from-red-500/30 hover:to-orange-500/30 transition-all duration-300"
           >
-            Alright let me in already...
+            Fine, let me in...
           </button>
         </div>
       </div>
@@ -176,69 +186,100 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
   if (!showPrank) return children;
 
   return (
-    <div ref={containerRef} className="fixed inset-0 bg-gray-900 flex items-center justify-center z-[9999] overflow-hidden">
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 max-w-md w-full mx-4 text-center shadow-2xl">
-        <div className="text-6xl mb-4">🔧</div>
-        <h1 className="text-2xl font-bold text-red-500 mb-2">SERVER MAINTENANCE</h1>
-        <h2 className="text-lg text-gray-400 mb-4">MAY NOT ACCESS EVERYTHING</h2>
-        
-        <div className="bg-gray-700 rounded-lg p-4 mb-4 text-left">
-          <p className="text-yellow-400 font-medium">{reason}</p>
+    <div ref={containerRef} className="fixed inset-0 bg-background flex items-center justify-center z-[9999] overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/20 via-background to-background" />
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      {/* Grid Pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(99, 102, 241, 0.5) 1px, transparent 1px),
+                           linear-gradient(90deg, rgba(99, 102, 241, 0.5) 1px, transparent 1px)`,
+          backgroundSize: '50px 50px'
+        }}
+      />
+
+      {/* Main Content */}
+      <div className="relative z-10 bg-card/80 backdrop-blur-xl border border-indigo-500/30 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 text-center shadow-2xl shadow-indigo-500/20">
+        {/* Icon */}
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 mb-4">
+          <AlertTriangle className="w-8 h-8 text-indigo-400 animate-pulse" />
         </div>
 
-        <div className="bg-gray-700 rounded-lg p-3 mb-4">
-          <p className="text-gray-300 text-sm">
-            We apologize for the inconvenience. Our team of highly trained hamsters is working around the clock to restore service.
+        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-2">
+          SERVER MAINTENANCE
+        </h1>
+        <h2 className="text-sm sm:text-base text-muted-foreground mb-4">
+          The demon portal is temporarily closed
+        </h2>
+        
+        <div className="bg-muted/50 rounded-xl p-4 mb-4 text-left border border-indigo-500/10">
+          <div className="flex items-start gap-2">
+            <Sparkles className="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-indigo-300">{reason}</p>
+          </div>
+        </div>
+
+        <div className="bg-muted/30 rounded-xl p-3 mb-4 border border-indigo-500/10">
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Our team of highly skilled demons is working tirelessly to restore service. 
+            Please try again later... or don't.
           </p>
         </div>
 
         {attempts > 0 && (
-          <p className="text-gray-500 text-sm">
+          <p className="text-xs text-muted-foreground mb-2">
             Button escaped {attempts} time{attempts > 1 ? 's' : ''}... 
-            {attempts > 20 && " (you're persistent!)"}
-            {attempts > 50 && " (okay this is impressive)"}
-            {attempts > 75 && " (just give up already)"}
+            {attempts > 10 && " (persistent!)"}
+            {attempts > 30 && " (impressive!)"}
+            {attempts > 50 && " (seriously?)"}
+            {attempts > 75 && " (just click it already!)"}
           </p>
         )}
 
         {attempts >= 50 && !showGiveUp && (
           <button
             onClick={() => setShowGiveUp(true)}
-            className="mt-4 px-3 py-1 text-xs bg-gray-600 text-gray-400 rounded hover:bg-gray-500"
+            className="mt-2 px-3 py-1 text-xs bg-muted/50 text-muted-foreground rounded-lg hover:bg-muted transition-colors border border-indigo-500/10"
           >
             ...I give up
           </button>
         )}
       </div>
 
+      {/* Escaping Button */}
       <button
         onMouseEnter={handleMouseEnter}
         onClick={handleButtonClick}
-        className="px-3 py-1.5 text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded 
-          hover:from-purple-600 hover:to-pink-600 shadow-lg cursor-pointer fixed z-[10000]"
+        className="px-4 py-2 text-sm bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl 
+          hover:from-indigo-600 hover:to-purple-600 shadow-lg shadow-indigo-500/25 cursor-pointer fixed z-[10000] transition-all duration-100"
         style={{
           left: `${buttonPos.x}px`,
           top: `${buttonPos.y}px`,
-          transition: 'left 0.12s ease-out, top 0.12s ease-out'
         }}
       >
-        Nevermind continue
+        Enter anyway
       </button>
 
       {showGiveUp && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10001]">
-          <div className="bg-gray-800 p-6 rounded-lg text-center">
-            <p className="text-gray-300 mb-4">Are you sure you want to give up? 😈</p>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10001]">
+          <div className="bg-card border border-indigo-500/30 p-6 rounded-2xl text-center shadow-2xl shadow-indigo-500/20">
+            <p className="text-muted-foreground mb-4">Are you sure you want to give up? The demons are watching...</p>
             <div className="flex gap-3 justify-center">
               <button
                 onClick={handleGiveUp}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-300 rounded-xl hover:bg-red-500/30 transition-colors"
               >
                 Yes, I give up
               </button>
               <button
                 onClick={() => setShowGiveUp(false)}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+                className="px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl hover:bg-indigo-500/30 transition-colors"
               >
                 No, I'll keep trying
               </button>

@@ -1,4 +1,4 @@
-import { ChevronDown, Skull, Sparkles } from 'lucide-react';
+import { Skull, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { WebsiteContent, Level, Member } from '@/types';
 
