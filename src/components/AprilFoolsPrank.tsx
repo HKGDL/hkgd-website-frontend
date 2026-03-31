@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Skull, Zap, AlertTriangle, Sparkles } from 'lucide-react';
+import { api } from '@/lib/api';
 
 const maintenanceReasons = [
   "Server is taking a NAP",
@@ -54,13 +55,8 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkSettings = async () => {
       try {
-        const response = await fetch('/api/settings');
-        if (response.ok) {
-          const settings = await response.json();
-          setIsEnabled(settings.april_fools_enabled === true);
-        } else {
-          setIsEnabled(false);
-        }
+        const settings = await api.getSettings();
+        setIsEnabled(settings.april_fools_enabled === true);
       } catch (error) {
         console.error('Failed to fetch settings:', error);
         setIsEnabled(false);
