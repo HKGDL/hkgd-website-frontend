@@ -159,11 +159,17 @@ export function AdminCMSRefactored({
     try {
       console.log('Approving submission:', submission);
       
-      if (submission.isNewLevel && submission.levelData) {
-        // Create new level from AREDL data
+      // Check if level already exists in our database
+      const existingLevel = levels.find(l => l.id === submission.levelId);
+      
+      if (!existingLevel) {
+        // Level doesn't exist - create it from submission data
+        const levelData = submission.levelData || {};
+        
+        // Calculate HKGD rank for new level
         const allLevelsWithNew = [...levels, {
           id: submission.levelId,
-          aredlRank: submission.levelData.aredlRank || 9999
+          aredlRank: levelData.aredlRank || 9999
         }];
         const sortedByAredl = allLevelsWithNew
           .filter(l => l.aredlRank !== null)
@@ -174,30 +180,31 @@ export function AdminCMSRefactored({
         const newLevel: Level = {
           id: submission.levelId,
           hkgdRank: hkgdRank,
-          aredlRank: submission.levelData.aredlRank || null,
-          pemonlistRank: submission.levelData.pemonlistRank || null,
-          name: submission.levelData.name || submission.levelName || 'Unknown',
-          creator: submission.levelData.creator || 'Unknown',
-          verifier: submission.levelData.verifier || 'Unknown',
+          aredlRank: levelData.aredlRank || null,
+          pemonlistRank: levelData.pemonlistRank || null,
+          name: levelData.name || submission.levelName || 'Unknown',
+          creator: levelData.creator || 'Unknown',
+          verifier: levelData.verifier || 'Unknown',
           levelId: submission.levelId,
-          description: submission.levelData.description,
-          thumbnail: submission.levelData.thumbnail,
-          songId: submission.levelData.songId,
-          songName: submission.levelData.songName,
-          tags: submission.levelData.tags || ['Overall'],
+          description: levelData.description || '',
+          thumbnail: levelData.thumbnail,
+          songId: levelData.songId,
+          songName: levelData.songName,
+          tags: levelData.tags || ['Overall'],
           dateAdded: submission.submittedAt,
-          records: [submission.record],
-          pack: submission.levelData.pack,
-          gddlTier: submission.levelData.gddlTier,
-          nlwTier: submission.levelData.nlwTier
+          records: [],
+          pack: levelData.pack,
+          gddlTier: levelData.gddlTier,
+          nlwTier: levelData.nlwTier
         };
 
+        console.log('Creating new level:', newLevel);
         await api.createLevel(newLevel);
-        await api.addRecord(newLevel.id, submission.record);
-      } else {
-        // Add record to existing level
-        await api.addRecord(submission.levelId, submission.record);
       }
+      
+      // Add the record (level should now exist)
+      console.log('Adding record to level:', submission.levelId, submission.record);
+      await api.addRecord(submission.levelId, submission.record);
       
       // Update submission status
       await api.updatePendingSubmission(submission.id, 'approved');
