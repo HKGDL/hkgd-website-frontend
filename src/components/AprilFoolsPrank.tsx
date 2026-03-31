@@ -2,10 +2,11 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { Skull, Zap, AlertTriangle, Sparkles } from 'lucide-react';
 
 const maintenanceReasons = [
+  "Server is taking a NAP"
   "Syncing with the demon portal...",
   "Recalibrating difficulty rankings...",
   "The verifier is taking a coffee break...",
-  "Upgrading to Geometry Dash 3.0... just kidding",
+  "Upgrading to Geometry Dash 2.3 ... just kidding",
   "Server is attempting Bloodlust...",
   "Hamster-powered CPU needs more hamsters",
   "Quantum demon physics recalibration",
@@ -14,6 +15,8 @@ const maintenanceReasons = [
   "CPU went to practice timings",
   "Server got stuck on a wave part",
   "Memory modules are buffering a recording",
+  "Server is selecting the 8 keys"
+  "Server is trying Heliopolis for the 10000 bounty"
   "DNS server forgot its click pattern",
   "Server is grinding for stars",
   "Developer fell asleep during verification",
@@ -137,7 +140,7 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
             Wait What?!
           </h1>
           <h2 className="text-xl text-yellow-400 mb-4">You actually clicked it?!</h2>
-          <p className="text-muted-foreground mb-6">Fine, you win this round. The demons await...</p>
+          <p className="text-muted-foreground mb-6">No No No That Is Not Fair...</p>
           <button
             onClick={() => {
               setShowWinnerMessage(false);
@@ -168,7 +171,7 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
           <h1 className="text-3xl font-bold text-red-400 mb-2">Skill Issue Detected</h1>
           <h2 className="text-xl text-muted-foreground mb-4">Server 1 - 0 You</h2>
           <p className="text-muted-foreground mb-2">You gave up after {attempts} attempts.</p>
-          <p className="text-sm text-muted-foreground mb-6">The demons would be disappointed...</p>
+          <p className="text-sm text-muted-foreground mb-6">You Cant Even Beat a Demon LMAO</p>
           <button
             onClick={() => {
               setShowLoserMessage(false);
@@ -215,7 +218,7 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
           SERVER MAINTENANCE
         </h1>
         <h2 className="text-sm sm:text-base text-muted-foreground mb-4">
-          The demon portal is temporarily closed
+          The List Is Fucked Up 
         </h2>
         
         <div className="bg-muted/50 rounded-xl p-4 mb-4 text-left border border-indigo-500/10">
@@ -227,7 +230,7 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
 
         <div className="bg-muted/30 rounded-xl p-3 mb-4 border border-indigo-500/10">
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Our team of highly skilled demons is working tirelessly to restore service. 
+            White Emerald is working with some AI to restore service. 
             Please try again later... or don't.
           </p>
         </div>
@@ -235,10 +238,10 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
         {attempts > 0 && (
           <p className="text-xs text-muted-foreground mb-2">
             Button escaped {attempts} time{attempts > 1 ? 's' : ''}... 
-            {attempts > 10 && " (persistent!)"}
+            {attempts > 10 && " (Skillless!)"}
             {attempts > 30 && " (impressive!)"}
             {attempts > 50 && " (seriously?)"}
-            {attempts > 75 && " (just click it already!)"}
+            {attempts > 75 && " (just Give Up already!)"}
           </p>
         )}
 
@@ -269,7 +272,7 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
       {showGiveUp && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10001]">
           <div className="bg-card border border-indigo-500/30 p-6 rounded-2xl text-center shadow-2xl shadow-indigo-500/20">
-            <p className="text-muted-foreground mb-4">Are you sure you want to give up? The demons are watching...</p>
+            <p className="text-muted-foreground mb-4">Are you sure you want to give up?</p>
             <div className="flex gap-3 justify-center">
               <button
                 onClick={handleGiveUp}
@@ -281,7 +284,7 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
                 onClick={() => setShowGiveUp(false)}
                 className="px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl hover:bg-indigo-500/30 transition-colors"
               >
-                No, I'll keep trying
+                I Wont Give Up.
               </button>
             </div>
           </div>
