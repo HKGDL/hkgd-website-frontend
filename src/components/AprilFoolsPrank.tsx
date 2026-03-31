@@ -75,6 +75,20 @@ export function AprilFoolsPrank({ children }: { children: React.ReactNode }) {
     }
   }, [isEnabled]);
 
+  // Block Tab key to prevent keyboard navigation to the button
+  useEffect(() => {
+    if (!showPrank || !isEnabled) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showPrank, isEnabled]);
+
   const moveButton = useCallback(() => {
     if (!containerRef.current) return;
     
