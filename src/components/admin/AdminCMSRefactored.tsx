@@ -190,9 +190,9 @@ export function AdminCMSRefactored({
         
         const hkgdRank = sortedByAredl.findIndex(l => l.id === submission.levelId) + 1;
         
-        // Use AREDL thumbnail or GD browser thumbnail
+        // Use AREDL thumbnail or Prevter levelthumbs as fallback
         const thumbnail = levelData.thumbnail || 
-          `https://raw.githubusercontent.com/cgytrus/SmlGDBrowser/main/levelThumbs/${submission.levelId}.png`;
+          `https://levelthumbs.prevter.me/thumbnail/${submission.levelId}`;
         
         const newLevel: Level = {
           id: submission.levelId,
