@@ -163,13 +163,26 @@ export function AdminCMSRefactored({
       const existingLevel = levels.find(l => l.id === submission.levelId);
       
       if (!existingLevel) {
-        // Level doesn't exist - create it from submission data
-        const levelData = submission.levelData || {};
+        // Level doesn't exist - fetch data from AREDL API
+        let aredlData: any = null;
+        try {
+          const aredlLevels = await api.getAREDLLevels();
+          aredlData = aredlLevels.find((l: any) => 
+            l.level_id?.toString() === submission.levelId || 
+            l.id?.toString() === submission.levelId
+          );
+          console.log('Fetched AREDL data:', aredlData);
+        } catch (err) {
+          console.warn('Could not fetch AREDL data, using submission data:', err);
+        }
+        
+        // Use AREDL data or fall back to submission data
+        const levelData = aredlData || submission.levelData || {};
         
         // Calculate HKGD rank for new level
         const allLevelsWithNew = [...levels, {
           id: submission.levelId,
-          aredlRank: levelData.aredlRank || 9999
+          aredlRank: levelData.position || levelData.aredlRank || 9999
         }];
         const sortedByAredl = allLevelsWithNew
           .filter(l => l.aredlRank !== null)
@@ -177,19 +190,25 @@ export function AdminCMSRefactored({
         
         const hkgdRank = sortedByAredl.findIndex(l => l.id === submission.levelId) + 1;
         
+        // Use AREDL thumbnail or GD browser thumbnail
+        const thumbnail = levelData.thumbnail || 
+          `https://raw.githubusercontent.com/cgytrus/SmlGDBrowser/main/levelThumbs/${submission.levelId}.png`;
+        
         const newLevel: Level = {
           id: submission.levelId,
           hkgdRank: hkgdRank,
-          aredlRank: levelData.aredlRank || null,
+          aredlRank: levelData.position || levelData.aredlRank || null,
           pemonlistRank: levelData.pemonlistRank || null,
           name: levelData.name || submission.levelName || 'Unknown',
           creator: levelData.creator || 'Unknown',
           verifier: levelData.verifier || 'Unknown',
           levelId: submission.levelId,
           description: levelData.description || '',
-          thumbnail: levelData.thumbnail,
-          songId: levelData.songId,
-          songName: levelData.songName,
+          thumbnail: thumbnail,
+          songId: levelData.song?.id?.toString() || levelData.songId,
+          songName: levelData.song?.name 
+            ? `${levelData.song.name}${levelData.song.author ? ` by ${levelData.song.author}` : ''}`
+            : levelData.songName,
           tags: levelData.tags || ['Overall'],
           dateAdded: submission.submittedAt,
           records: [],
