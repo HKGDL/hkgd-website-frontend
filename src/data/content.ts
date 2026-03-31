@@ -1,5 +1,16 @@
 import type { WebsiteContent } from '@/types';
 
+// Get API URL from environment (same logic as api.ts)
+const getApiBaseUrl = () => {
+  const envApiUrl = import.meta.env.VITE_API_URL;
+  if (envApiUrl) {
+    return envApiUrl;
+  }
+  return '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
 // Default website content - can be edited via admin panel
 export const defaultContent: WebsiteContent = {
   hero: {
@@ -37,7 +48,7 @@ export const defaultContent: WebsiteContent = {
 // Load content from API or use default
 export async function loadContent(): Promise<WebsiteContent> {
   try {
-    const response = await fetch('/api/content');
+    const response = await fetch(`${API_BASE_URL}/content`);
     if (response.ok) {
       const content = await response.json();
       return content;
@@ -50,12 +61,12 @@ export async function loadContent(): Promise<WebsiteContent> {
 
 // Save content to API (requires authentication)
 export async function saveContent(content: WebsiteContent): Promise<void> {
-  const token = localStorage.getItem('admin_token');
+  const token = localStorage.getItem('hkgd_admin_token');
   if (!token) {
     throw new Error('Authentication required');
   }
 
-  const response = await fetch('/api/content', {
+  const response = await fetch(`${API_BASE_URL}/content`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
