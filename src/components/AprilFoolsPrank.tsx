@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { Skull, Zap, AlertTriangle, Sparkles } from 'lucide-react';
 
 const maintenanceReasons = [
-  "Server is taking a NAP"
+  "Server is taking a NAP",
   "Syncing with the demon portal...",
   "Recalibrating difficulty rankings...",
   "The verifier is taking a coffee break...",
@@ -15,8 +15,8 @@ const maintenanceReasons = [
   "CPU went to practice timings",
   "Server got stuck on a wave part",
   "Memory modules are buffering a recording",
-  "Server is selecting the 8 keys"
-  "Server is trying Heliopolis for the 10000 bounty"
+  "Server is selecting the 8 keys",
+  "Server is trying Heliopolis for the 10000 bounty",
   "DNS server forgot its click pattern",
   "Server is grinding for stars",
   "Developer fell asleep during verification",
