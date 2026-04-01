@@ -98,6 +98,12 @@ export function EditLevelModal({ level, onClose, onSave, onDeleted }: EditLevelM
     setIsSaving(true);
     try {
       const updatedLevel: Partial<Level> = {
+        // Preserve existing rank and date fields
+        hkgdRank: level.hkgdRank,
+        aredlRank: level.aredlRank,
+        pemonlistRank: level.pemonlistRank,
+        dateAdded: level.dateAdded,
+        // Update editable fields
         name: formData.name,
         creator: formData.creator,
         verifier: formData.verifier,

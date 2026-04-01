@@ -160,7 +160,7 @@ export function AdminCMSRefactored({
       console.log('Approving submission:', submission);
       
       // Check if level already exists in our database
-      const existingLevel = levels.find(l => l.id === submission.levelId);
+      const existingLevel = levels.find(l => l.levelId === submission.levelId);
       
       if (!existingLevel) {
         // Level doesn't exist - fetch data from AREDL API
@@ -221,9 +221,10 @@ export function AdminCMSRefactored({
         await api.createLevel(newLevel);
       }
       
-      // Add the record (level should now exist)
-      console.log('Adding record to level:', submission.levelId, submission.record);
-      await api.addRecord(submission.levelId, submission.record);
+      // Add the record - use the level's database ID if it exists, otherwise use submission.levelId
+      const levelIdForRecord = existingLevel ? existingLevel.id : submission.levelId;
+      console.log('Adding record to level:', levelIdForRecord, submission.record);
+      await api.addRecord(levelIdForRecord, submission.record);
       
       // Update submission status
       await api.updatePendingSubmission(submission.id, 'approved');
