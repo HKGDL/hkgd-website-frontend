@@ -179,7 +179,7 @@ export function AdminCMSRefactored({
         // Use AREDL data or fall back to submission data
         const levelData = aredlData || submission.levelData || {};
         
-        // Fetch creator/verifier from Pointercrate for top 150, or GDBrowser for below 150
+        // Fetch creator/verifier from Pointercrate for top 150, or GDBrowser for everything else
         let creator = levelData.creator || 'Unknown';
         let verifier = levelData.verifier || 'Unknown';
         const position = levelData.position || levelData.aredlRank || 9999;
@@ -199,20 +199,20 @@ export function AdminCMSRefactored({
           } catch (pcError) {
             console.warn('Failed to fetch from Pointercrate:', pcError);
           }
-        }
-        
-        // For levels below 150 (or if Pointercrate didn't return creator), fetch from GDBrowser
-        if (position > 150 && levelIdToFetch) {
-          try {
-            const gdbResponse = await fetch(`https://gdbrowser.com/api/level/${levelIdToFetch}`);
-            if (gdbResponse.ok) {
-              const gdbData = await gdbResponse.json();
-              if (gdbData.author) {
-                creator = gdbData.author;
+        } else {
+          // NOT top 150 - fetch from GDBrowser
+          if (levelIdToFetch) {
+            try {
+              const gdbResponse = await fetch(`https://gdbrowser.com/api/level/${levelIdToFetch}`);
+              if (gdbResponse.ok) {
+                const gdbData = await gdbResponse.json();
+                if (gdbData.author) {
+                  creator = gdbData.author;
+                }
               }
+            } catch (gdbError) {
+              console.warn('Failed to fetch from GDBrowser:', gdbError);
             }
-          } catch (gdbError) {
-            console.warn('Failed to fetch from GDBrowser:', gdbError);
           }
         }
         
