@@ -179,15 +179,41 @@ export function AdminCMSRefactored({
         // Use AREDL data or fall back to submission data
         const levelData = aredlData || submission.levelData || {};
         
-        // Extract creator - handle both AREDL format (publisher.name) and submission format (creator string)
-        const creator = levelData.creator || 
-          levelData.publisher?.name || 
-          'Unknown';
+        // Fetch creator/verifier from Pointercrate for top 150, or GDBrowser for below 150
+        let creator = levelData.creator || 'Unknown';
+        let verifier = levelData.verifier || 'Unknown';
+        const position = levelData.position || levelData.aredlRank || 9999;
         
-        // Extract verifier - handle both AREDL format (verifier.name) and submission format (verifier string)
-        const verifier = levelData.verifier?.name || 
-          levelData.verifier || 
-          'Unknown';
+        if (position <= 150 && aredlData?.name) {
+          // Top 150 - fetch from Pointercrate
+          try {
+            const pcResponse = await fetch(`https://pointercrate.com/api/v2/demons/?name_contains=${encodeURIComponent(aredlData.name)}`);
+            if (pcResponse.ok) {
+              const pcData = await pcResponse.json();
+              if (pcData.length > 0) {
+                creator = pcData[0].publisher?.name || creator;
+                verifier = pcData[0].verifier?.name || verifier;
+              }
+            }
+          } catch (pcError) {
+            console.warn('Failed to fetch from Pointercrate:', pcError);
+          }
+        } else if (position > 150 && aredlData?.level_id) {
+          // Below 150 - fetch from GDBrowser for creator only
+          try {
+            const gdbResponse = await fetch(`https://gdbrowser.com/api/level/${aredlData.level_id}`);
+            if (gdbResponse.ok) {
+              const gdbData = await gdbResponse.json();
+              creator = gdbData.author || creator;
+            }
+          } catch (gdbError) {
+            console.warn('Failed to fetch from GDBrowser:', gdbError);
+          }
+        }
+        
+        // Final fallback to submission data
+        creator = creator === 'Unknown' ? (submission.levelData?.creator || 'Unknown') : creator;
+        verifier = verifier === 'Unknown' ? (submission.levelData?.verifier || 'Unknown') : verifier;
         
         // Calculate HKGD rank for new level
         const allLevelsWithNew = [...levels, {
