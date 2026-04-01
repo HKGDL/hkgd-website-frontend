@@ -179,6 +179,16 @@ export function AdminCMSRefactored({
         // Use AREDL data or fall back to submission data
         const levelData = aredlData || submission.levelData || {};
         
+        // Extract creator - handle both AREDL format (publisher.name) and submission format (creator string)
+        const creator = levelData.creator || 
+          levelData.publisher?.name || 
+          'Unknown';
+        
+        // Extract verifier - handle both AREDL format (verifier.name) and submission format (verifier string)
+        const verifier = levelData.verifier?.name || 
+          levelData.verifier || 
+          'Unknown';
+        
         // Calculate HKGD rank for new level
         const allLevelsWithNew = [...levels, {
           id: submission.levelId,
@@ -200,8 +210,8 @@ export function AdminCMSRefactored({
           aredlRank: levelData.position || levelData.aredlRank || null,
           pemonlistRank: levelData.pemonlistRank || null,
           name: levelData.name || submission.levelName || 'Unknown',
-          creator: levelData.creator || 'Unknown',
-          verifier: levelData.verifier || 'Unknown',
+          creator: creator,
+          verifier: verifier,
           levelId: submission.levelId,
           description: levelData.description || '',
           thumbnail: thumbnail,
