@@ -1,11 +1,30 @@
-import { Skull, ExternalLink, Heart, Shield } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Skull, ExternalLink, Heart, Shield, Tag } from 'lucide-react';
 import type { WebsiteContent } from '@/types';
 
 interface FooterProps {
   content: WebsiteContent['footer'];
 }
 
+const GITHUB_REPO = 'HKGDL/hkgd-website-frontend';
+
 export function Footer({ content }: FooterProps) {
+  const [latestVersion, setLatestVersion] = useState<string>('v0.0.0');
+
+  useEffect(() => {
+    const fetchVersion = async () => {
+      try {
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
+        if (response.ok) {
+          const data = await response.json();
+          setLatestVersion(data.tag_name);
+        }
+      } catch {
+        // Silently fail, keep default version
+      }
+    };
+    fetchVersion();
+  }, []);
   return (
     <footer className="border-t border-border/50 bg-card/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -74,6 +93,15 @@ export function Footer({ content }: FooterProps) {
             {content.credits}
           </p>
           <div className="flex items-center gap-4">
+            <a
+              href={`https://github.com/${GITHUB_REPO}/releases`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-indigo-400 transition-colors flex items-center gap-1"
+            >
+              <Tag className="w-3 h-3" />
+              {latestVersion}
+            </a>
             <span className="text-xs text-muted-foreground">
               Not affiliated with RobTop Games
             </span>
