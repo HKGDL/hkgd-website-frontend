@@ -35,8 +35,8 @@ export interface ChangelogEntry {
   levelName: string;
   levelId: string;
   change: 'added' | 'moved_up' | 'moved_down' | 'removed';
-  oldRank?: number;
-  newRank?: number;
+  oldRank: number | null;
+  newRank: number | null;
   description: string;
   listType?: 'classic' | 'platformer';
 }

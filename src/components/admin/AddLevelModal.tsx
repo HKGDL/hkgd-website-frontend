@@ -201,6 +201,7 @@ export function AddLevelModal({ levels, onClose, onAdded }: AddLevelModalProps) 
         levelName: formData.name,
         levelId: levelId,
         change: 'added' as const,
+        oldRank: null,
         newRank: hkgdRank,
         description: description,
         listType: 'classic' as const,

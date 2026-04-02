@@ -62,8 +62,8 @@ export function ChangelogManagement({
       levelName: newEntry.levelName || 'System',
       levelId: newEntry.levelId || 'system',
       change: newEntry.change,
-      oldRank: newEntry.oldRank ? parseInt(newEntry.oldRank) : undefined,
-      newRank: newEntry.newRank ? parseInt(newEntry.newRank) : undefined,
+      oldRank: newEntry.oldRank ? parseInt(newEntry.oldRank) : null,
+      newRank: newEntry.newRank ? parseInt(newEntry.newRank) : null,
       description: newEntry.description,
       listType: newEntry.listType
     };
