@@ -17,6 +17,7 @@ export interface Level {
   pack?: string;
   gddlTier?: number;
   nlwTier?: string;
+  edelEnjoyment?: number | null;
 }
 
 export interface Record {

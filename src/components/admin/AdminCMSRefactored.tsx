@@ -254,8 +254,9 @@ export function AdminCMSRefactored({
           dateAdded: submission.submittedAt,
           records: [],
           pack: levelData.pack,
-          gddlTier: levelData.gddlTier,
-          nlwTier: levelData.nlwTier
+          gddlTier: levelData.gddl_tier,
+          nlwTier: levelData.nlw_tier,
+          edelEnjoyment: levelData.edel_enjoyment || null
         };
 
         console.log('Creating new level:', newLevel);

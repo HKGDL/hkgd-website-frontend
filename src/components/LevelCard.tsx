@@ -1,5 +1,5 @@
 import type { Level } from '@/types';
-import { ExternalLink, Trophy } from 'lucide-react';
+import { ExternalLink, Trophy, Smile } from 'lucide-react';
 
 interface LevelCardProps {
   level: Level;
@@ -16,6 +16,14 @@ export function LevelCard({ level, allLevels, onClick }: LevelCardProps) {
   };
 
   const hkgdRank = level.aredlRank ? calculateHkgdRank(level) : level.hkgdRank;
+
+  // Get enjoyment color based on rating
+  const getEnjoymentColor = (rating: number | null | undefined) => {
+    if (!rating || rating === 0) return 'text-muted-foreground';
+    if (rating >= 70) return 'text-emerald-400';
+    if (rating >= 50) return 'text-amber-400';
+    return 'text-red-400';
+  };
 
   return (
     <div
@@ -39,6 +47,15 @@ export function LevelCard({ level, allLevels, onClick }: LevelCardProps) {
                     : 'HKGD')}
             </span>
           </div>
+          {/* EDEL Enjoyment Rating */}
+          {level.edelEnjoyment !== null && level.edelEnjoyment !== undefined && level.edelEnjoyment > 0 && (
+            <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
+              <Smile className={`w-3 h-3 ${getEnjoymentColor(level.edelEnjoyment)}`} />
+              <span className={`text-xs font-medium ${getEnjoymentColor(level.edelEnjoyment)}`}>
+                {level.edelEnjoyment.toFixed(1)}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
