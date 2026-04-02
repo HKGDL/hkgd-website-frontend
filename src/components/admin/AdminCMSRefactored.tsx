@@ -260,6 +260,22 @@ export function AdminCMSRefactored({
 
         console.log('Creating new level:', newLevel);
         await api.createLevel(newLevel);
+        
+        // Create changelog entry for the new level
+        const changelogEntry = {
+          id: `changelog-${Date.now()}`,
+          date: (() => {
+            const d = new Date();
+            return `${d.getFullYear().toString().slice(-2)}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+          })(),
+          levelName: newLevel.name,
+          levelId: submission.levelId,
+          change: 'added' as const,
+          newRank: hkgdRank,
+          description: `${newLevel.name} was added to the list at rank #${hkgdRank}`,
+          listType: 'classic' as const,
+        };
+        await api.addChangelog(changelogEntry);
       }
       
       // Add the record - use the level's database ID if it exists, otherwise use submission.levelId
@@ -385,6 +401,22 @@ export function AdminCMSRefactored({
       };
 
       await api.createLevel(newLevel);
+
+      // Create changelog entry for the new platformer level
+      const changelogEntry = {
+        id: `changelog-${Date.now()}`,
+        date: (() => {
+          const d = new Date();
+          return `${d.getFullYear().toString().slice(-2)}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+        })(),
+        levelName: newLevel.name,
+        levelId: pemonlistLevel.level_id.toString(),
+        change: 'added' as const,
+        newRank: newHKGDRank,
+        description: `${newLevel.name} was added to the platformer list at rank #${newHKGDRank}`,
+        listType: 'platformer' as const,
+      };
+      await api.addChangelog(changelogEntry);
 
       // Reload data to refresh the list
       await onReloadData();

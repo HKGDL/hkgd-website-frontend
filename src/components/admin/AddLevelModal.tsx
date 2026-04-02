@@ -125,6 +125,14 @@ export function AddLevelModal({ levels, onClose, onAdded }: AddLevelModalProps) 
     return classicLevels.length + 1;
   };
 
+  // Helper function to format date as YY/MM/DD
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear().toString().slice(-2);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}/${month}/${day}`;
+  };
+
   const handleSave = async () => {
     if (!formData.name || !formData.creator || !formData.verifier || !formData.levelId) {
       alert('Name, Creator, Verifier, and Level ID are required');
@@ -169,6 +177,19 @@ export function AddLevelModal({ levels, onClose, onAdded }: AddLevelModalProps) 
       };
 
       await api.createLevel(newLevel);
+
+      // Create changelog entry for the new level
+      const changelogEntry = {
+        id: `changelog-${Date.now()}`,
+        date: formatDate(new Date()),
+        levelName: formData.name,
+        levelId: levelId,
+        change: 'added' as const,
+        newRank: hkgdRank,
+        description: `${formData.name} was added to the list at rank #${hkgdRank}`,
+        listType: 'classic' as const,
+      };
+      await api.addChangelog(changelogEntry);
 
       // Add record if provided
       if (addRecord && record.player && record.date && record.videoUrl) {
