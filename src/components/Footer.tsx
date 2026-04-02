@@ -36,10 +36,12 @@ export function Footer({ content }: FooterProps) {
   useEffect(() => {
     const fetchVersion = async () => {
       try {
-        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases`);
         if (response.ok) {
-          const data = await response.json();
-          setLatestVersion(data.tag_name);
+          const data: GitHubRelease[] = await response.json();
+          if (data.length > 0) {
+            setLatestVersion(data[0].tag_name);
+          }
         }
       } catch {
         // Silently fail, keep default version
