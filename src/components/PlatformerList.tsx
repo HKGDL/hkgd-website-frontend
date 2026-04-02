@@ -107,7 +107,7 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
                 {/* Rank Badge */}
                 <div className="absolute top-4 left-4 z-10">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                    <span className="text-xl font-bold text-white">#{level.hkgdRank}</span>
+                    <span className="text-xl font-bold text-white">#{index + 1}</span>
                   </div>
                 </div>
 
