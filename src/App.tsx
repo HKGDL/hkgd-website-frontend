@@ -8,7 +8,6 @@ import { AdminCMSRefactored as AdminCMS } from '@/components/admin/AdminCMSRefac
 import { SubmitRecord } from '@/components/SubmitRecord';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { AprilFoolsPrank } from '@/components/AprilFoolsPrank';
-import { VersionBadge } from '@/components/VersionBadge';
 import { defaultContent, loadContent } from '@/data/content';
 import { api } from '@/lib/api';
 import type { Level, ChangelogEntry, Member, Record, PendingSubmission, WebsiteContent } from '@/types';
@@ -235,9 +234,6 @@ if (isLoading) {
             onClose={() => setIsSubmitOpen(false)}
           />
         )}
-
-        {/* Version Badge */}
-        <VersionBadge />
       </div>
     </AprilFoolsPrank>
   );
