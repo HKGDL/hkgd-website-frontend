@@ -287,7 +287,7 @@ export function Footer({ content }: FooterProps) {
           <div className="mt-12 pt-8 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground flex items-center gap-1">
               <Heart className="w-4 h-4 text-red-400" />
-              {content.credits}
+              Made with love by HKGD community
             </p>
             <div className="flex items-center gap-4">
               <button
