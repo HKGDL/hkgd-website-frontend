@@ -13,17 +13,19 @@ interface ChangelogProps {
 }
 
 export function Changelog({ entries }: ChangelogProps) {
-  // Sort entries by newRank (HKGD rank) instead of date
+  // Sort entries by date (newest first)
   const sortedEntries = [...entries].sort((a, b) => {
-    // If both have newRank, sort by rank (lower rank = higher difficulty = show first)
-    if (a.newRank && b.newRank) {
-      return a.newRank - b.newRank;
-    }
-    // If only one has newRank, show it first
-    if (a.newRank) return -1;
-    if (b.newRank) return 1;
-    // If neither has newRank, sort by date (newest first)
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
+    // Parse date format: YY/MM/DD
+    const parseDate = (dateStr: string) => {
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        const [year, month, day] = parts.map(Number);
+        return new Date(2000 + year, month - 1, day).getTime();
+      }
+      // Fallback for other date formats
+      return new Date(dateStr).getTime();
+    };
+    return parseDate(b.date) - parseDate(a.date);
   });
 
   const getChangeIcon = (change: ChangelogEntry['change']) => {
