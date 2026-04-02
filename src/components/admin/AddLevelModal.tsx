@@ -178,6 +178,22 @@ export function AddLevelModal({ levels, onClose, onAdded }: AddLevelModalProps) 
 
       await api.createLevel(newLevel);
 
+      // Get levels above and below for changelog description
+      const sortedClassicLevels = levels
+        .filter(l => l.aredlRank !== null)
+        .sort((a, b) => (a.hkgdRank || 9999) - (b.hkgdRank || 9999));
+      const levelAbove = sortedClassicLevels[hkgdRank - 2]; // rank - 1 (0-indexed)
+      const levelBelow = sortedClassicLevels[hkgdRank - 1]; // rank + 1 (after insertion)
+      
+      let description = `${formData.name} was added at rank #${hkgdRank}`;
+      if (levelAbove && levelBelow) {
+        description += `, above ${levelBelow.name} and below ${levelAbove.name}`;
+      } else if (levelAbove) {
+        description += `, below ${levelAbove.name}`;
+      } else if (levelBelow) {
+        description += `, above ${levelBelow.name}`;
+      }
+
       // Create changelog entry for the new level
       const changelogEntry = {
         id: `changelog-${Date.now()}`,
@@ -186,7 +202,7 @@ export function AddLevelModal({ levels, onClose, onAdded }: AddLevelModalProps) 
         levelId: levelId,
         change: 'added' as const,
         newRank: hkgdRank,
-        description: `${formData.name} was added to the list at rank #${hkgdRank}`,
+        description: description,
         listType: 'classic' as const,
       };
       await api.addChangelog(changelogEntry);

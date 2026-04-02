@@ -261,6 +261,22 @@ export function AdminCMSRefactored({
         console.log('Creating new level:', newLevel);
         await api.createLevel(newLevel);
         
+        // Get levels above and below for changelog description
+        const sortedClassicLevels = levels
+          .filter(l => l.aredlRank !== null)
+          .sort((a, b) => (a.hkgdRank || 9999) - (b.hkgdRank || 9999));
+        const levelAbove = sortedClassicLevels[hkgdRank - 2];
+        const levelBelow = sortedClassicLevels[hkgdRank - 1];
+        
+        let description = `${newLevel.name} was added at rank #${hkgdRank}`;
+        if (levelAbove && levelBelow) {
+          description += `, above ${levelBelow.name} and below ${levelAbove.name}`;
+        } else if (levelAbove) {
+          description += `, below ${levelAbove.name}`;
+        } else if (levelBelow) {
+          description += `, above ${levelBelow.name}`;
+        }
+        
         // Create changelog entry for the new level
         const changelogEntry = {
           id: `changelog-${Date.now()}`,
@@ -272,7 +288,7 @@ export function AdminCMSRefactored({
           levelId: submission.levelId,
           change: 'added' as const,
           newRank: hkgdRank,
-          description: `${newLevel.name} was added to the list at rank #${hkgdRank}`,
+          description: description,
           listType: 'classic' as const,
         };
         await api.addChangelog(changelogEntry);
@@ -402,6 +418,22 @@ export function AdminCMSRefactored({
 
       await api.createLevel(newLevel);
 
+      // Get levels above and below for changelog description
+      const sortedPlatformerLevels = levels
+        .filter(l => l.aredlRank === null)
+        .sort((a, b) => (a.hkgdRank || 9999) - (b.hkgdRank || 9999));
+      const levelAbove = sortedPlatformerLevels[newHKGDRank - 2];
+      const levelBelow = sortedPlatformerLevels[newHKGDRank - 1];
+      
+      let description = `${newLevel.name} was added at rank #${newHKGDRank}`;
+      if (levelAbove && levelBelow) {
+        description += `, above ${levelBelow.name} and below ${levelAbove.name}`;
+      } else if (levelAbove) {
+        description += `, below ${levelAbove.name}`;
+      } else if (levelBelow) {
+        description += `, above ${levelBelow.name}`;
+      }
+
       // Create changelog entry for the new platformer level
       const changelogEntry = {
         id: `changelog-${Date.now()}`,
@@ -413,7 +445,7 @@ export function AdminCMSRefactored({
         levelId: pemonlistLevel.level_id.toString(),
         change: 'added' as const,
         newRank: newHKGDRank,
-        description: `${newLevel.name} was added to the platformer list at rank #${newHKGDRank}`,
+        description: description,
         listType: 'platformer' as const,
       };
       await api.addChangelog(changelogEntry);
