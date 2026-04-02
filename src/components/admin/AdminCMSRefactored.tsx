@@ -341,7 +341,7 @@ export function AdminCMSRefactored({
       const result = await api.syncAREDL();
       
       if (result.success) {
-        alert(`AREDL sync completed!\n\n${result.message}\n\n- Added: ${result.stats.added}\n- Updated: ${result.stats.updated}\n- Moved: ${result.stats.rankChanges}\n- Total levels: ${result.stats.totalLevels}`);
+        alert(`AREDL sync completed!\n\n${result.message}\n\n- Updated levels: ${result.updatedLevels || result.details?.length || 0}`);
         
         // Reload data to refresh all lists
         await onReloadData();
