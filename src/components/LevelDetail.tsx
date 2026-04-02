@@ -11,7 +11,8 @@ import {
   Play,
   Monitor,
   Target,
-  Zap
+  Zap,
+  Smile
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -143,9 +144,9 @@ export function LevelDetail({ level, allLevels, onClose }: LevelDetailProps) {
               </div>
             </div>
 
-            {/* Tiers */}
-            {(level.gddlTier || level.nlwTier) && (
-              <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
+            {/* Tiers & Enjoyment */}
+            {(level.gddlTier || level.nlwTier || (level.edelEnjoyment && level.edelEnjoyment > 0)) && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
                 {level.gddlTier && (
                   <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                     <span className="text-[10px] sm:text-xs text-indigo-400 uppercase tracking-wider">GDDL Tier</span>
@@ -156,6 +157,15 @@ export function LevelDetail({ level, allLevels, onClose }: LevelDetailProps) {
                   <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-amber-500/10 border border-amber-500/20">
                     <span className="text-[10px] sm:text-xs text-amber-400 uppercase tracking-wider">NLW Tier</span>
                     <p className="text-base sm:text-lg font-bold text-amber-100">{level.nlwTier}</p>
+                  </div>
+                )}
+                {level.edelEnjoyment && level.edelEnjoyment > 0 && (
+                  <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                    <div className="flex items-center gap-1">
+                      <Smile className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400" />
+                      <span className="text-[10px] sm:text-xs text-emerald-400 uppercase tracking-wider">EDEL Enjoyment</span>
+                    </div>
+                    <p className="text-base sm:text-lg font-bold text-emerald-100">{level.edelEnjoyment.toFixed(1)}</p>
                   </div>
                 )}
               </div>
