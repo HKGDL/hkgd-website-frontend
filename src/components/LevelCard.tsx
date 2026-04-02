@@ -1,5 +1,5 @@
 import type { Level } from '@/types';
-import { ExternalLink, Trophy, Smile } from 'lucide-react';
+import { ExternalLink, Trophy, Smile, Layers } from 'lucide-react';
 
 interface LevelCardProps {
   level: Level;
@@ -53,6 +53,15 @@ export function LevelCard({ level, allLevels, onClick }: LevelCardProps) {
               <Smile className={`w-3 h-3 ${getEnjoymentColor(level.edelEnjoyment)}`} />
               <span className={`text-xs font-medium ${getEnjoymentColor(level.edelEnjoyment)}`}>
                 {level.edelEnjoyment.toFixed(1)}
+              </span>
+            </div>
+          )}
+          {/* NLW Tier */}
+          {level.nlwTier && (
+            <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
+              <Layers className="w-3 h-3 text-cyan-400" />
+              <span className="text-xs font-medium text-cyan-400">
+                NLW {level.nlwTier}
               </span>
             </div>
           )}
