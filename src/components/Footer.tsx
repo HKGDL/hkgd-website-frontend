@@ -24,10 +24,12 @@ interface GitHubRelease {
   prerelease: boolean;
 }
 
-const GITHUB_REPO = 'HKGDL/hkgd-website-frontend';
+const GITHUB_REPO_FRONTEND = 'HKGDL/hkgd-website-frontend';
+const GITHUB_REPO_API = 'HKGDL/HKGD-Website-API';
 
 export function Footer({ content }: FooterProps) {
   const [latestVersion, setLatestVersion] = useState<string>('v0.0.0');
+  const [apiVersion, setApiVersion] = useState<string>('v0.0.0');
   const [isOpen, setIsOpen] = useState(false);
   const [releases, setReleases] = useState<GitHubRelease[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,11 +38,22 @@ export function Footer({ content }: FooterProps) {
   useEffect(() => {
     const fetchVersion = async () => {
       try {
-        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases`);
-        if (response.ok) {
-          const data: GitHubRelease[] = await response.json();
+        const [frontendRes, apiRes] = await Promise.all([
+          fetch(`https://api.github.com/repos/${GITHUB_REPO_FRONTEND}/releases`),
+          fetch(`https://api.github.com/repos/${GITHUB_REPO_API}/releases`)
+        ]);
+        
+        if (frontendRes.ok) {
+          const data: GitHubRelease[] = await frontendRes.json();
           if (data.length > 0) {
             setLatestVersion(data[0].tag_name);
+          }
+        }
+        
+        if (apiRes.ok) {
+          const data: GitHubRelease[] = await apiRes.json();
+          if (data.length > 0) {
+            setApiVersion(data[0].tag_name);
           }
         }
       } catch {
@@ -54,7 +67,7 @@ export function Footer({ content }: FooterProps) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases`);
+      const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO_FRONTEND}/releases`);
       if (!response.ok) {
         throw new Error('Failed to fetch releases');
       }
@@ -165,8 +178,17 @@ export function Footer({ content }: FooterProps) {
                 className="text-xs text-muted-foreground hover:text-indigo-400 transition-colors flex items-center gap-1"
               >
                 <Tag className="w-3 h-3" />
-                {latestVersion}
+                Frontend {latestVersion}
               </button>
+              <a
+                href={`https://github.com/${GITHUB_REPO_API}/releases`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-indigo-400 transition-colors flex items-center gap-1"
+              >
+                <Tag className="w-3 h-3" />
+                API {apiVersion}
+              </a>
               <span className="text-xs text-muted-foreground">
                 Not affiliated with RobTop Games
               </span>
@@ -263,7 +285,7 @@ export function Footer({ content }: FooterProps) {
 
           <div className="pt-4 border-t border-border/50 text-center">
             <a
-              href={`https://github.com/${GITHUB_REPO}/releases`}
+              href={`https://github.com/${GITHUB_REPO_FRONTEND}/releases`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors inline-flex items-center gap-1"
