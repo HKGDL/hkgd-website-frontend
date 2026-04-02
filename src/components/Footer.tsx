@@ -30,10 +30,14 @@ const GITHUB_REPO_API = 'HKGDL/HKGD-Website-API';
 export function Footer({ content }: FooterProps) {
   const [latestVersion, setLatestVersion] = useState<string>('v0.0.0');
   const [apiVersion, setApiVersion] = useState<string>('v0.0.0');
-  const [isOpen, setIsOpen] = useState(false);
-  const [releases, setReleases] = useState<GitHubRelease[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isFrontendOpen, setIsFrontendOpen] = useState(false);
+  const [isApiOpen, setIsApiOpen] = useState(false);
+  const [frontendReleases, setFrontendReleases] = useState<GitHubRelease[]>([]);
+  const [apiReleases, setApiReleases] = useState<GitHubRelease[]>([]);
+  const [isLoadingFrontend, setIsLoadingFrontend] = useState(false);
+  const [isLoadingApi, setIsLoadingApi] = useState(false);
+  const [frontendError, setFrontendError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -63,28 +67,51 @@ export function Footer({ content }: FooterProps) {
     fetchVersion();
   }, []);
 
-  const fetchReleases = async () => {
-    setIsLoading(true);
-    setError(null);
+  const fetchFrontendReleases = async () => {
+    setIsLoadingFrontend(true);
+    setFrontendError(null);
     try {
       const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO_FRONTEND}/releases`);
       if (!response.ok) {
         throw new Error('Failed to fetch releases');
       }
       const data: GitHubRelease[] = await response.json();
-      setReleases(data);
+      setFrontendReleases(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load changelog');
+      setFrontendError(err instanceof Error ? err.message : 'Failed to load changelog');
     } finally {
-      setIsLoading(false);
+      setIsLoadingFrontend(false);
+    }
+  };
+
+  const fetchApiReleases = async () => {
+    setIsLoadingApi(true);
+    setApiError(null);
+    try {
+      const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO_API}/releases`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch releases');
+      }
+      const data: GitHubRelease[] = await response.json();
+      setApiReleases(data);
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : 'Failed to load changelog');
+    } finally {
+      setIsLoadingApi(false);
     }
   };
 
   useEffect(() => {
-    if (isOpen) {
-      fetchReleases();
+    if (isFrontendOpen) {
+      fetchFrontendReleases();
     }
-  }, [isOpen]);
+  }, [isFrontendOpen]);
+
+  useEffect(() => {
+    if (isApiOpen) {
+      fetchApiReleases();
+    }
+  }, [isApiOpen]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -102,6 +129,96 @@ export function Footer({ content }: FooterProps) {
       .replace(/`(.*?)`/g, '<code class="bg-muted px-1 py-0.5 rounded text-sm">$1</code>')
       .replace(/- (.*)/g, '<li>$1</li>')
       .replace(/\n/g, '<br />');
+  };
+
+  const renderReleases = (
+    releases: GitHubRelease[], 
+    isLoading: boolean, 
+    error: string | null, 
+    onRetry: () => void
+  ) => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
+        </div>
+      );
+    }
+    
+    if (error) {
+      return (
+        <div className="text-center py-12 text-destructive">
+          <p>{error}</p>
+          <button 
+            onClick={onRetry}
+            className="mt-4 text-sm text-indigo-400 hover:text-indigo-300 underline"
+          >
+            Try again
+          </button>
+        </div>
+      );
+    }
+    
+    if (releases.length === 0) {
+      return (
+        <div className="text-center py-12 text-muted-foreground">
+          <p>No releases found</p>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="space-y-6">
+        {releases.map((release, index) => (
+          <div
+            key={release.id}
+            className={`p-4 rounded-xl border transition-all duration-300 ${
+              index === 0
+                ? 'border-indigo-500/30 bg-indigo-500/5'
+                : 'border-border/50 bg-muted/30'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  index === 0
+                    ? 'bg-indigo-500/20 text-indigo-300'
+                    : 'bg-muted text-muted-foreground'
+                }`}>
+                  {release.tag_name}
+                </span>
+                {release.prerelease && (
+                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400">
+                    Pre-release
+                  </span>
+                )}
+              </div>
+              <a
+                href={release.html_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-indigo-400 transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              Released on {formatDate(release.published_at)}
+            </p>
+            {release.body ? (
+              <div 
+                className="text-sm text-foreground/90 leading-relaxed prose prose-invert prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: parseMarkdown(release.body) }}
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground italic">
+                No release notes provided
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -174,21 +291,19 @@ export function Footer({ content }: FooterProps) {
             </p>
             <div className="flex items-center gap-4">
               <button
-                onClick={() => setIsOpen(true)}
+                onClick={() => setIsFrontendOpen(true)}
                 className="text-xs text-muted-foreground hover:text-indigo-400 transition-colors flex items-center gap-1"
               >
                 <Tag className="w-3 h-3" />
                 Frontend {latestVersion}
               </button>
-              <a
-                href={`https://github.com/${GITHUB_REPO_API}/releases`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => setIsApiOpen(true)}
                 className="text-xs text-muted-foreground hover:text-indigo-400 transition-colors flex items-center gap-1"
               >
                 <Tag className="w-3 h-3" />
                 API {apiVersion}
-              </a>
+              </button>
               <span className="text-xs text-muted-foreground">
                 Not affiliated with RobTop Games
               </span>
@@ -197,95 +312,57 @@ export function Footer({ content }: FooterProps) {
         </div>
       </footer>
 
-      {/* Changelog Dialog */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {/* Frontend Changelog Dialog */}
+      <Dialog open={isFrontendOpen} onOpenChange={setIsFrontendOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] bg-card/95 backdrop-blur-xl border-indigo-500/20">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
               <Tag className="w-5 h-5 text-indigo-400" />
-              Changelog
+              Frontend Changelog
             </DialogTitle>
             <DialogDescription>
-              Version history and updates from GitHub
+              Website frontend version history
             </DialogDescription>
           </DialogHeader>
 
           <ScrollArea className="h-[60vh] pr-4">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
-              </div>
-            ) : error ? (
-              <div className="text-center py-12 text-destructive">
-                <p>{error}</p>
-                <button 
-                  onClick={fetchReleases}
-                  className="mt-4 text-sm text-indigo-400 hover:text-indigo-300 underline"
-                >
-                  Try again
-                </button>
-              </div>
-            ) : releases.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No releases found</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {releases.map((release, index) => (
-                  <div
-                    key={release.id}
-                    className={`p-4 rounded-xl border transition-all duration-300 ${
-                      index === 0
-                        ? 'border-indigo-500/30 bg-indigo-500/5'
-                        : 'border-border/50 bg-muted/30'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          index === 0
-                            ? 'bg-indigo-500/20 text-indigo-300'
-                            : 'bg-muted text-muted-foreground'
-                        }`}>
-                          {release.tag_name}
-                        </span>
-                        {release.prerelease && (
-                          <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400">
-                            Pre-release
-                          </span>
-                        )}
-                      </div>
-                      <a
-                        href={release.html_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-indigo-400 transition-colors"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Released on {formatDate(release.published_at)}
-                    </p>
-                    {release.body ? (
-                      <div 
-                        className="text-sm text-foreground/90 leading-relaxed prose prose-invert prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: parseMarkdown(release.body) }}
-                      />
-                    ) : (
-                      <p className="text-sm text-muted-foreground italic">
-                        No release notes provided
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            {renderReleases(frontendReleases, isLoadingFrontend, frontendError, fetchFrontendReleases)}
           </ScrollArea>
 
           <div className="pt-4 border-t border-border/50 text-center">
             <a
               href={`https://github.com/${GITHUB_REPO_FRONTEND}/releases`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors inline-flex items-center gap-1"
+            >
+              View all releases on GitHub
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* API Changelog Dialog */}
+      <Dialog open={isApiOpen} onOpenChange={setIsApiOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] bg-card/95 backdrop-blur-xl border-indigo-500/20">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Tag className="w-5 h-5 text-indigo-400" />
+              API Changelog
+            </DialogTitle>
+            <DialogDescription>
+              Backend API version history
+            </DialogDescription>
+          </DialogHeader>
+
+          <ScrollArea className="h-[60vh] pr-4">
+            {renderReleases(apiReleases, isLoadingApi, apiError, fetchApiReleases)}
+          </ScrollArea>
+
+          <div className="pt-4 border-t border-border/50 text-center">
+            <a
+              href={`https://github.com/${GITHUB_REPO_API}/releases`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors inline-flex items-center gap-1"
