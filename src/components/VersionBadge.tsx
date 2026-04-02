@@ -19,7 +19,7 @@ interface GitHubRelease {
   prerelease: boolean;
 }
 
-const GITHUB_REPO = 'HKGDL/hkgd-website';
+const GITHUB_REPO = 'HKGDL/hkgd-website-frontend';
 
 export function VersionBadge() {
   const [isOpen, setIsOpen] = useState(false);
@@ -77,7 +77,7 @@ export function VersionBadge() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-40 flex items-center gap-2 px-3 py-1.5 
+        className="fixed top-4 right-4 z-40 flex items-center gap-2 px-3 py-1.5 
                    bg-gradient-to-r from-indigo-500/10 to-purple-500/10 
                    hover:from-indigo-500/20 hover:to-purple-500/20
                    border border-indigo-500/30 hover:border-indigo-500/50
