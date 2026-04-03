@@ -96,21 +96,19 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
                 </button>
               );
             })}
+            {onOpenLeaderboard && (
+              <button
+                onClick={onOpenLeaderboard}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-yellow-400 hover:bg-yellow-500/20"
+              >
+                <Trophy className="w-4 h-4" />
+                Leaderboard
+              </button>
+            )}
           </nav>
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-2">
-            {onOpenLeaderboard && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onOpenLeaderboard}
-                className="gap-2 hover:bg-yellow-500/20 hover:text-yellow-400 hover:border-yellow-500/50"
-              >
-                <Trophy className="w-4 h-4" />
-                Leaderboard
-              </Button>
-            )}
             {onSubmitRecord && (
               <Button
                 variant="default"
@@ -172,18 +170,16 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
                 );
               })}
               {onOpenLeaderboard && (
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => {
                     onOpenLeaderboard();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="mt-2 gap-2"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-yellow-400 hover:bg-yellow-500/20"
                 >
                   <Trophy className="w-4 h-4" />
                   Leaderboard
-                </Button>
+                </button>
               )}
               {onSubmitRecord && (
                 <Button
