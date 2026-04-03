@@ -18,7 +18,7 @@ interface PlayerStats {
     rank: number;
     points: number;
   }>;
-  hardestRank: number;
+  hardestAredlRank: number | null;
 }
 
 /**
@@ -53,11 +53,14 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
           points: points
         };
 
+        // Track hardest AREDL rank (lower is harder)
+        const aredlRank = level.aredlRank;
+
         if (existing) {
           existing.totalPoints += points;
           existing.records.push(recordInfo);
-          if (level.hkgdRank < existing.hardestRank) {
-            existing.hardestRank = level.hkgdRank;
+          if (aredlRank !== null && (existing.hardestAredlRank === null || aredlRank < existing.hardestAredlRank)) {
+            existing.hardestAredlRank = aredlRank;
           }
         } else {
           playerMap.set(normalizedName, {
@@ -65,7 +68,7 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
             normalizedName,
             totalPoints: points,
             records: [recordInfo],
-            hardestRank: level.hkgdRank
+            hardestAredlRank: aredlRank
           });
         }
       });
@@ -205,7 +208,7 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
                       </div>
                       <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                         <span>{player.records.length} records</span>
-                        <span>Hardest: #{player.hardestRank}</span>
+                        <span>Hardest (AREDL): {player.hardestAredlRank !== null ? `#${player.hardestAredlRank}` : 'N/A'}</span>
                       </div>
                     </div>
 
