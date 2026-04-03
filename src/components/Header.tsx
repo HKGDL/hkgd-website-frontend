@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Skull, Menu, X, Trophy, List, Upload, Gamepad2, Shield } from 'lucide-react';
+import { Skull, Menu, X, Trophy, List, Upload, Gamepad2, Shield, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
@@ -7,9 +7,10 @@ interface HeaderProps {
   currentPage: string;
   onSubmitRecord?: () => void;
   onOpenAdmin?: () => void;
+  onOpenSettings?: () => void;
 }
 
-export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin }: HeaderProps) {
+export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, onOpenSettings }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoClicks, setLogoClicks] = useState(0);
@@ -109,6 +110,16 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin }:
                 Submit
               </Button>
             )}
+            {onOpenSettings && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onOpenSettings}
+                className="rounded-full hover:bg-muted"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -160,6 +171,20 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin }:
                 >
                   <Upload className="w-4 h-4" />
                   Submit Record
+                </Button>
+              )}
+              {onOpenSettings && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    onOpenSettings();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="mt-2 gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
                 </Button>
               )}
             </nav>

@@ -6,6 +6,7 @@ import { PlatformerList } from '@/components/PlatformerList';
 import { Footer } from '@/components/Footer';
 import { AdminCMSRefactored as AdminCMS } from '@/components/admin/AdminCMSRefactored';
 import { SubmitRecord } from '@/components/SubmitRecord';
+import { UserSettings } from '@/components/UserSettings';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { AprilFoolsPrank } from '@/components/AprilFoolsPrank';
 import { defaultContent, loadContent } from '@/data/content';
@@ -22,6 +23,7 @@ function App() {
   const [pendingSubmissions, setPendingSubmissions] = useState<PendingSubmission[]>([]);
   const [content, setContent] = useState<WebsiteContent>(defaultContent);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showPrerelease, setShowPrerelease] = useState(true);
@@ -185,6 +187,7 @@ if (isLoading) {
           currentPage={currentPage} 
           onSubmitRecord={() => setIsSubmitOpen(true)}
           onOpenAdmin={() => setIsAdminOpen(true)}
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
         
         <main className={currentPage === 'home' ? 'min-h-screen' : 'pt-20 min-h-screen'}>
@@ -233,6 +236,11 @@ if (isLoading) {
             onSubmit={handleSubmitRecord}
             onClose={() => setIsSubmitOpen(false)}
           />
+        )}
+
+        {/* User Settings Modal */}
+        {isSettingsOpen && (
+          <UserSettings onClose={() => setIsSettingsOpen(false)} />
         )}
       </div>
     </AprilFoolsPrank>
