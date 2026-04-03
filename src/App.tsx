@@ -91,6 +91,13 @@ function App() {
     }
   }, [isSettingsOpen]);
 
+  // Close UserArea when experimental features disabled
+  useEffect(() => {
+    if (!experimentalFeatures && isUserAreaOpen) {
+      setIsUserAreaOpen(false);
+    }
+  }, [experimentalFeatures, isUserAreaOpen]);
+
   const loadAllData = async () => {
     try {
       setIsLoading(true);
@@ -299,7 +306,7 @@ if (isLoading) {
         )}
 
         {/* User Area Modal (Experimental) */}
-        {isUserAreaOpen && (
+        {isUserAreaOpen && experimentalFeatures && (
           <UserArea onClose={() => setIsUserAreaOpen(false)} />
         )}
       </div>
