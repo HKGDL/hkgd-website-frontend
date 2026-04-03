@@ -297,4 +297,19 @@ export const api = {
     if (!response.ok) throw new Error('Failed to update setting');
     return response.json();
   },
+
+  // IP Ban Management
+  getIPBans: async () => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/ip-bans`);
+    if (!response.ok) throw new Error('Failed to fetch IP bans');
+    return response.json();
+  },
+
+  unbanIP: async (ip: string) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/ip-bans/${encodeURIComponent(ip)}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to unban IP');
+    return response.json();
+  },
 };

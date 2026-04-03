@@ -3,7 +3,6 @@ import { X, Lock, AlertTriangle, ShieldAlert, Clock, Eye, EyeOff } from 'lucide-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { api } from '@/lib/api';
 
 interface AdminAuthProps {
   onLogin: (password: string) => void;
@@ -29,22 +28,8 @@ export function AdminAuth({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    try {
-      const result = await api.login(password);
-      if (result.success) {
-        onLogin(password);
-        setPassword('');
-      } else {
-        // Let parent handle the error
-        onLogin(password);
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      onLogin(password); // Let parent handle the error
-    } finally {
-      setIsLoading(false);
-    }
+    await onLogin(password);
+    setIsLoading(false);
   };
 
   return (
