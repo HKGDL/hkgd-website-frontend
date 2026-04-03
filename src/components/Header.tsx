@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Skull, Menu, X, Trophy, List, Upload, Gamepad2, Shield, Settings } from 'lucide-react';
+import { Skull, Menu, X, Trophy, List, Upload, Gamepad2, Shield, Settings, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
@@ -8,9 +8,11 @@ interface HeaderProps {
   onSubmitRecord?: () => void;
   onOpenAdmin?: () => void;
   onOpenSettings?: () => void;
+  onOpenUserArea?: () => void;
+  experimentalFeatures?: boolean;
 }
 
-export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, onOpenSettings }: HeaderProps) {
+export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, onOpenSettings, onOpenUserArea, experimentalFeatures }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoClicks, setLogoClicks] = useState(0);
@@ -99,6 +101,17 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-2">
+            {experimentalFeatures && onOpenUserArea && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onOpenUserArea}
+                className="rounded-full hover:bg-indigo-500/20 hover:text-indigo-400 border-amber-500/30"
+                title="User Area (Experimental)"
+              >
+                <User className="w-4 h-4" />
+              </Button>
+            )}
             {onSubmitRecord && (
               <Button
                 variant="default"
@@ -159,6 +172,21 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
                   </button>
                 );
               })}
+              {experimentalFeatures && onOpenUserArea && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    onOpenUserArea();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="mt-2 gap-2 border-amber-500/30"
+                >
+                  <User className="w-4 h-4" />
+                  User Area
+                  <span className="text-[10px] bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded">EXP</span>
+                </Button>
+              )}
               {onSubmitRecord && (
                 <Button
                   variant="default"
