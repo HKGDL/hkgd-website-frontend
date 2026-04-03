@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { X, Moon, Sun, Monitor, Sparkles, FlaskConical } from 'lucide-react';
+import { X, Moon, Sun, Monitor, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -13,13 +13,11 @@ interface UserSettingsProps {
 interface UserPreferences {
   reduceMotion: boolean;
   hidePrerelease: boolean;
-  experimentalFeatures: boolean;
 }
 
 const defaultPreferences: UserPreferences = {
   reduceMotion: false,
   hidePrerelease: false,
-  experimentalFeatures: false,
 };
 
 export function UserSettings({ onClose }: UserSettingsProps) {
@@ -59,10 +57,6 @@ export function UserSettings({ onClose }: UserSettingsProps) {
 
   const handleHidePrereleaseChange = (checked: boolean) => {
     savePreferences({ ...preferences, hidePrerelease: checked });
-  };
-
-  const handleExperimentalFeaturesChange = (checked: boolean) => {
-    savePreferences({ ...preferences, experimentalFeatures: checked });
   };
 
   // Prevent hydration mismatch
@@ -174,37 +168,6 @@ export function UserSettings({ onClose }: UserSettingsProps) {
                 onCheckedChange={handleHidePrereleaseChange}
               />
             </div>
-          </div>
-
-          <Separator />
-
-          {/* Experimental Features */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <FlaskConical className="w-4 h-4 text-amber-500" />
-              <Label className="text-sm font-medium">Experimental</Label>
-            </div>
-            
-            {/* Experimental Features Toggle */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="experimental" className="text-sm">Enable Experimental Features</Label>
-                <p className="text-xs text-muted-foreground">Try out upcoming features before release</p>
-              </div>
-              <Switch
-                id="experimental"
-                checked={preferences.experimentalFeatures}
-                onCheckedChange={handleExperimentalFeaturesChange}
-              />
-            </div>
-
-            {preferences.experimentalFeatures && (
-              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                <p className="text-xs text-amber-600 dark:text-amber-400">
-                  Experimental features enabled! Check out the new User Area in the header.
-                </p>
-              </div>
-            )}
           </div>
         </div>
 

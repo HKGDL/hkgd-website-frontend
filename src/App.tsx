@@ -7,7 +7,7 @@ import { Footer } from '@/components/Footer';
 import { AdminCMSRefactored as AdminCMS } from '@/components/admin/AdminCMSRefactored';
 import { SubmitRecord } from '@/components/SubmitRecord';
 import { UserSettings } from '@/components/UserSettings';
-import { UserArea } from '@/components/UserArea';
+import { Leaderboard } from '@/components/Leaderboard';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { AprilFoolsPrank } from '@/components/AprilFoolsPrank';
 import { defaultContent, loadContent } from '@/data/content';
@@ -25,11 +25,10 @@ function App() {
   const [content, setContent] = useState<WebsiteContent>(defaultContent);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isUserAreaOpen, setIsUserAreaOpen] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showPrerelease, setShowPrerelease] = useState(true);
-  const [experimentalFeatures, setExperimentalFeatures] = useState(false);
 
   // Load data from backend API on mount
   useEffect(() => {
@@ -47,7 +46,6 @@ function App() {
     if (saved) {
       try {
         const prefs = JSON.parse(saved);
-        setExperimentalFeatures(prefs.experimentalFeatures || false);
         if (prefs.hidePrerelease) {
           setShowPrerelease(false);
         }
@@ -56,47 +54,6 @@ function App() {
       }
     }
   }, []);
-
-  // Listen for changes to user preferences
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const saved = localStorage.getItem('hkgd_user_preferences');
-      if (saved) {
-        try {
-          const prefs = JSON.parse(saved);
-          setExperimentalFeatures(prefs.experimentalFeatures || false);
-        } catch {
-          // Use defaults
-        }
-      }
-    };
-
-    // Check on settings close
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  // Update experimental features when settings modal closes
-  useEffect(() => {
-    if (!isSettingsOpen) {
-      const saved = localStorage.getItem('hkgd_user_preferences');
-      if (saved) {
-        try {
-          const prefs = JSON.parse(saved);
-          setExperimentalFeatures(prefs.experimentalFeatures || false);
-        } catch {
-          // Use defaults
-        }
-      }
-    }
-  }, [isSettingsOpen]);
-
-  // Close UserArea when experimental features disabled
-  useEffect(() => {
-    if (!experimentalFeatures && isUserAreaOpen) {
-      setIsUserAreaOpen(false);
-    }
-  }, [experimentalFeatures, isUserAreaOpen]);
 
   const loadAllData = async () => {
     try {
@@ -248,8 +205,7 @@ if (isLoading) {
           onSubmitRecord={() => setIsSubmitOpen(true)}
           onOpenAdmin={() => setIsAdminOpen(true)}
           onOpenSettings={() => setIsSettingsOpen(true)}
-          onOpenUserArea={() => setIsUserAreaOpen(true)}
-          experimentalFeatures={experimentalFeatures}
+          onOpenLeaderboard={() => setIsLeaderboardOpen(true)}
         />
         
         <main className={currentPage === 'home' ? 'min-h-screen' : 'pt-20 min-h-screen'}>
@@ -305,9 +261,9 @@ if (isLoading) {
           <UserSettings onClose={() => setIsSettingsOpen(false)} />
         )}
 
-        {/* User Area Modal (Experimental) */}
-        {isUserAreaOpen && experimentalFeatures && (
-          <UserArea onClose={() => setIsUserAreaOpen(false)} />
+        {/* Leaderboard Modal */}
+        {isLeaderboardOpen && (
+          <Leaderboard levels={levels} onClose={() => setIsLeaderboardOpen(false)} />
         )}
       </div>
     </AprilFoolsPrank>
