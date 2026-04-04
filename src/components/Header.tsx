@@ -3,7 +3,7 @@ import { Skull, Menu, X, Trophy, List, Upload, Gamepad2, Shield, Settings } from
 import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
-  onNavigate: (page: 'home' | 'list' | 'platformer') => void;
+  onNavigate: (page: 'home' | 'list' | 'platformer' | 'leaderboard') => void;
   currentPage: string;
   onSubmitRecord?: () => void;
   onOpenAdmin?: () => void;
@@ -48,6 +48,7 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
   const navItems = [
     { id: 'list', label: 'Demon List', icon: List },
     { id: 'platformer', label: 'Platformer', icon: Gamepad2 },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
   ];
 
   return (
@@ -84,7 +85,7 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
               return (
                 <button
                   key={item.id}
-                  onClick={() => onNavigate(item.id as 'list' | 'platformer')}
+                  onClick={() => onNavigate(item.id as 'list' | 'platformer' | 'leaderboard')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     currentPage === item.id
                       ? 'bg-indigo-500/20 text-indigo-400'
@@ -96,15 +97,6 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
                 </button>
               );
             })}
-            {onOpenLeaderboard && (
-              <button
-                onClick={onOpenLeaderboard}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-yellow-400 hover:bg-yellow-500/20"
-              >
-                <Trophy className="w-4 h-4" />
-                Leaderboard
-              </button>
-            )}
           </nav>
 
           {/* Action Buttons */}
@@ -155,7 +147,7 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
                   <button
                     key={item.id}
                     onClick={() => {
-                      onNavigate(item.id as 'list' | 'platformer');
+                      onNavigate(item.id as 'list' | 'platformer' | 'leaderboard');
                       setIsMobileMenuOpen(false);
                     }}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -169,18 +161,6 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
                   </button>
                 );
               })}
-              {onOpenLeaderboard && (
-                <button
-                  onClick={() => {
-                    onOpenLeaderboard();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-yellow-400 hover:bg-yellow-500/20"
-                >
-                  <Trophy className="w-4 h-4" />
-                  Leaderboard
-                </button>
-              )}
               {onSubmitRecord && (
                 <Button
                   variant="default"

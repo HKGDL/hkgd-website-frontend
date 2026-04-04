@@ -14,7 +14,7 @@ import { defaultContent, loadContent } from '@/data/content';
 import { api } from '@/lib/api';
 import type { Level, ChangelogEntry, Member, Record, PendingSubmission, WebsiteContent } from '@/types';
 
-type Page = 'home' | 'list' | 'platformer';
+type Page = 'home' | 'list' | 'platformer' | 'leaderboard';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -25,7 +25,7 @@ function App() {
   const [content, setContent] = useState<WebsiteContent>(defaultContent);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showPrerelease, setShowPrerelease] = useState(true);
@@ -170,7 +170,7 @@ const handleSubmitRecord = async (levelId: string, record: Record, levelData?: P
     setPendingSubmissions(updatedPending);
   };
 
-  const renderContent = () => {
+   const renderContent = () => {
     switch (currentPage) {
       case 'home':
         return (
@@ -180,6 +180,8 @@ const handleSubmitRecord = async (levelId: string, record: Record, levelData?: P
         return <LevelList levels={levels} listPage={content.listPage} changelog={changelog} />;
       case 'platformer':
         return <PlatformerList platformerPage={content.platformerPage} levels={levels} />;
+      case 'leaderboard':
+        return <Leaderboard levels={levels} onClose={() => handleNavigate('home')} />;
       default:
         return null;
     }
@@ -199,14 +201,14 @@ if (isLoading) {
   return (
     <AprilFoolsPrank>
       <div className="min-h-screen bg-background">
-        <Header 
-          onNavigate={handleNavigate} 
-          currentPage={currentPage} 
-          onSubmitRecord={() => setIsSubmitOpen(true)}
-          onOpenAdmin={() => setIsAdminOpen(true)}
-          onOpenSettings={() => setIsSettingsOpen(true)}
-          onOpenLeaderboard={() => setIsLeaderboardOpen(true)}
-        />
+         <Header 
+           onNavigate={handleNavigate} 
+           currentPage={currentPage} 
+           onSubmitRecord={() => setIsSubmitOpen(true)}
+           onOpenAdmin={() => setIsAdminOpen(true)}
+           onOpenSettings={() => setIsSettingsOpen(true)}
+           onOpenLeaderboard={() => handleNavigate('leaderboard')}
+         />
         
         <main className={currentPage === 'home' ? 'min-h-screen' : 'pt-20 min-h-screen'}>
           {renderContent()}
@@ -261,10 +263,7 @@ if (isLoading) {
           <UserSettings onClose={() => setIsSettingsOpen(false)} />
         )}
 
-        {/* Leaderboard Modal */}
-        {isLeaderboardOpen && (
-          <Leaderboard levels={levels} onClose={() => setIsLeaderboardOpen(false)} />
-        )}
+         {/* Remove the modal leaderboard since it's now a full page */}
       </div>
     </AprilFoolsPrank>
   );

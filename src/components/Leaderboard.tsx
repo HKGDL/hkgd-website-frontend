@@ -123,34 +123,35 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      
-      {/* Modal */}
-      <div className="relative bg-background border border-border rounded-2xl shadow-2xl w-full max-w-6xl mx-4 overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="min-h-screen pt-24 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border bg-gradient-to-r from-yellow-500/10 via-indigo-500/10 to-purple-500/10">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center shadow-lg shadow-yellow-500/30">
-              <Trophy className="w-7 h-7 text-white" />
-            </div>
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col gap-4 sm:gap-6">
             <div>
-              <h2 className="text-xl font-bold">Leaderboard</h2>
-              <p className="text-sm text-muted-foreground">Player rankings based on record points</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-3 sm:mb-4">
+                <TrendingUp className="w-4 h-4 text-indigo-400" />
+                <span className="text-xs sm:text-sm text-indigo-300">Player Rankings</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+                Leaderboard
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Player rankings based on record points and completions
+              </p>
             </div>
+            
+            {/* Back Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              className="w-fit gap-2"
+            >
+              <X className="w-4 h-4" />
+              Back to Home
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="rounded-full hover:bg-muted"
-          >
-            <X className="w-5 h-5" />
-          </Button>
         </div>
 
         {/* Point System Info */}
@@ -280,18 +281,11 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
         </div>
 
         {/* Footer Stats */}
-        <div className="p-4 border-t border-border bg-muted/30">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
+        <div className="mt-12 pt-8 border-t border-border">
+          <div className="text-center text-sm text-muted-foreground">
+            <span>
               {leaderboardData.length} players • {levels.reduce((sum, l) => sum + l.records.length, 0)} total records
             </span>
-            <Button
-              onClick={onClose}
-              size="sm"
-              className="bg-indigo-500 hover:bg-indigo-600 text-white"
-            >
-              Close
-            </Button>
           </div>
         </div>
       </div>
