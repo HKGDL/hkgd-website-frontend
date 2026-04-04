@@ -53,12 +53,13 @@ export function PlayerDetail({
   // Enrich records with full level data
   const enrichedRecords = useMemo(() => {
     return records.map(record => {
-      const level = levels.find(l => l.name === record.levelName || l.id === record.levelId);
+      // Match by levelId (GD level ID like '107238250') or by name
+      const level = levels.find(l => l.levelId === record.levelId || l.name === record.levelName);
       return {
         ...record,
         thumbnail: level?.thumbnail,
-        creator: level?.creator || 'Unknown',
-        aredlRank: level?.aredlRank || null,
+        creator: level?.creator || record.creator || 'Unknown',
+        aredlRank: level?.aredlRank || record.aredlRank || null,
         levelId: level?.levelId || record.levelId || '',
       };
     });
