@@ -250,7 +250,7 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
                           {/* Records Preview */}
                           {player.records.length > 0 && (
                             <div className="text-xs text-muted-foreground mt-2">
-                              <span className="font-medium text-foreground">Top Records:</span>
+                              <span className="font-medium text-foreground">Top Records In HKGDL:</span>
                               <span className="ml-1">
                                 {player.records.slice(0, 3).map((record, idx) => (
                                   <span key={idx}>
