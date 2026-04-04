@@ -3,6 +3,7 @@ import { X, Trophy, Medal, Crown, TrendingUp, User, Search, Filter } from 'lucid
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { PlayerDetail } from '@/components/PlayerDetail';
 import type { Level } from '@/types';
 
 interface LeaderboardProps {
@@ -16,8 +17,16 @@ interface PlayerStats {
   totalPoints: number;
   records: Array<{
     levelName: string;
+    levelId: string;
     rank: number;
     points: number;
+    date: string;
+    videoUrl?: string;
+    fps?: string;
+    cbf?: boolean;
+    attempts?: number;
+    aredlRank: number | null;
+    creator: string;
   }>;
   hardestAredlRank: number | null;
 }
@@ -39,6 +48,7 @@ function calculatePoints(rank: number): number {
 export function Leaderboard({ levels, onClose }: LeaderboardProps) {
   const [sortBy, setSortBy] = useState<'points' | 'records'>('points');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null);
 
   const leaderboardData = useMemo(() => {
     const playerMap = new Map<string, PlayerStats>();
@@ -51,8 +61,16 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
         const points = calculatePoints(level.hkgdRank);
         const recordInfo = {
           levelName: level.name,
+          levelId: level.levelId,
           rank: level.hkgdRank,
-          points: points
+          points: points,
+          date: record.date,
+          videoUrl: record.videoUrl,
+          fps: record.fps,
+          cbf: record.cbf,
+          attempts: record.attempts,
+          aredlRank: level.aredlRank,
+          creator: level.creator
         };
 
         // Track hardest AREDL rank (lower is harder)
@@ -218,7 +236,8 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
                 return (
                   <div
                     key={player.normalizedName}
-                    className={`relative bg-card rounded-xl overflow-hidden border border-border/50 cursor-pointer card-hover active:scale-[0.98] transition-transform animate-fadeIn`}
+                    onClick={() => setSelectedPlayer(player)}
+                    className={`relative bg-card rounded-xl overflow-hidden border border-border/50 cursor-pointer card-hover active:scale-[0.98] transition-transform animate-fadeIn hover:bg-muted/50`}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
                     {/* Rank Badge */}
@@ -258,7 +277,7 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
                                     <span className="text-indigo-400">#{record.rank}</span> {record.levelName}
                                   </span>
                                 ))}
-                                {player.records.length > 3 && <span>, +{player.records.length - 3} more</span>}
+                                {player.records.length > 3 && <span className="text-indigo-400">, +{player.records.length - 3} more</span>}
                               </span>
                             </div>
                           )}
@@ -289,6 +308,18 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
           </div>
         </div>
       </div>
+
+      {/* Player Detail Modal */}
+      {selectedPlayer && (
+        <PlayerDetail
+          playerName={selectedPlayer.name}
+          records={selectedPlayer.records}
+          totalPoints={selectedPlayer.totalPoints}
+          hardestAredlRank={selectedPlayer.hardestAredlRank}
+          levels={levels}
+          onClose={() => setSelectedPlayer(null)}
+        />
+      )}
     </div>
   );
 }
