@@ -125,7 +125,7 @@ export function PendingSubmissions({
                   </div>
                 </div>
 
-                {submission.record.videoUrl && (
+                {submission.record.videoUrl && (submission.record.videoUrl.startsWith('http://') || submission.record.videoUrl.startsWith('https://')) && (
                   <a
                     href={submission.record.videoUrl}
                     target="_blank"

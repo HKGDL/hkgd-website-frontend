@@ -266,7 +266,7 @@ export function LevelDetail({ level, allLevels, onClose }: LevelDetailProps) {
                             <span className="text-xs sm:text-sm text-foreground">{record.attempts.toLocaleString()} atts</span>
                           </div>
                         )}
-                        {record.videoUrl ? (
+                        {record.videoUrl && (record.videoUrl.startsWith('http://') || record.videoUrl.startsWith('https://')) ? (
                           <a
                             href={record.videoUrl}
                             target="_blank"
