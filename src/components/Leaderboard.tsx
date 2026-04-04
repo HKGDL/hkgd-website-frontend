@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
-import { X, Trophy, Medal, Crown, TrendingUp, User } from 'lucide-react';
+import { X, Trophy, Medal, Crown, TrendingUp, User, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
 import type { Level } from '@/types';
 
 interface LeaderboardProps {
@@ -37,6 +38,7 @@ function calculatePoints(rank: number): number {
 
 export function Leaderboard({ levels, onClose }: LeaderboardProps) {
   const [sortBy, setSortBy] = useState<'points' | 'records'>('points');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const leaderboardData = useMemo(() => {
     const playerMap = new Map<string, PlayerStats>();
@@ -74,9 +76,17 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
       });
     });
 
-    // Convert to array and sort
+    // Convert to array, filter by search, and sort
     let players = Array.from(playerMap.values());
     
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      players = players.filter(player => 
+        player.name.toLowerCase().includes(query)
+      );
+    }
+
     if (sortBy === 'points') {
       players.sort((a, b) => b.totalPoints - a.totalPoints);
     } else {
@@ -84,7 +94,7 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
     }
 
     return players;
-  }, [levels, sortBy]);
+  }, [levels, sortBy, searchQuery]);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -121,7 +131,7 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
       />
       
       {/* Modal */}
-      <div className="relative bg-background border border-border rounded-2xl shadow-2xl w-full max-w-4xl mx-4 overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="relative bg-background border border-border rounded-2xl shadow-2xl w-full max-w-6xl mx-4 overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border bg-gradient-to-r from-yellow-500/10 via-indigo-500/10 to-purple-500/10">
           <div className="flex items-center gap-4">
@@ -157,28 +167,43 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
           </div>
         </div>
 
-        {/* Sort Toggle */}
-        <div className="px-6 py-3 border-b border-border flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Sort by:</span>
-          <Button
-            variant={sortBy === 'points' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSortBy('points')}
-            className={sortBy === 'points' ? 'bg-indigo-500 hover:bg-indigo-600' : ''}
-          >
-            Total Points
-          </Button>
-          <Button
-            variant={sortBy === 'records' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSortBy('records')}
-            className={sortBy === 'records' ? 'bg-indigo-500 hover:bg-indigo-600' : ''}
-          >
-            Record Count
-          </Button>
+        {/* Search and Controls */}
+        <div className="px-6 py-4 border-b border-border">
+          <div className="flex flex-col sm:flex-row gap-3 items-end">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search players..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-full bg-muted/50 border-border/50"
+              />
+            </div>
+            
+            {/* Sort Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Sort by:</span>
+              <Button
+                variant={sortBy === 'points' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSortBy('points')}
+                className={sortBy === 'points' ? 'bg-indigo-500 hover:bg-indigo-600' : ''}
+              >
+                Total Points
+              </Button>
+              <Button
+                variant={sortBy === 'records' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSortBy('records')}
+                className={sortBy === 'records' ? 'bg-indigo-500 hover:bg-indigo-600' : ''}
+              >
+                Record Count
+              </Button>
+            </div>
+          </div>
         </div>
 
-        {/* Leaderboard List */}
+        {/* Leaderboard List - Demonlist Style */}
         <div className="flex-1 overflow-y-auto">
           {leaderboardData.length === 0 ? (
             <div className="p-12 text-center text-muted-foreground">
@@ -186,38 +211,66 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
               <p>No records found</p>
             </div>
           ) : (
-            <div className="divide-y divide-border">
+            <div className="space-y-3 p-4">
               {leaderboardData.map((player, index) => {
                 const rank = index + 1;
                 return (
                   <div
                     key={player.normalizedName}
-                    className={`flex items-center gap-4 px-6 py-4 border-l-2 transition-colors ${getRankBg(rank)}`}
-                    style={{ borderLeftColor: rank <= 3 ? undefined : 'transparent' }}
+                    className={`relative bg-card rounded-xl overflow-hidden border border-border/50 cursor-pointer card-hover active:scale-[0.98] transition-transform animate-fadeIn`}
+                    style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    {/* Rank */}
-                    <div className="w-12 flex justify-center">
-                      {getRankIcon(rank)}
-                    </div>
-
-                    {/* Player Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-semibold truncate">{player.name}</span>
-                      </div>
-                      <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                        <span>{player.records.length} records</span>
-                        <span>Hardest (AREDL): {player.hardestAredlRank !== null ? `#${player.hardestAredlRank}` : 'N/A'}</span>
+                    {/* Rank Badge */}
+                    <div className="absolute top-3 left-3 z-10">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        {getRankIcon(rank)}
                       </div>
                     </div>
 
-                    {/* Points */}
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-indigo-400">
-                        {player.totalPoints.toFixed(1)}
+                    {/* Content */}
+                    <div className="p-4 pl-16">
+                      <div className="flex items-start gap-3">
+                        {/* Player Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <User className="w-4 h-4 text-muted-foreground" />
+                            <h3 className="text-base font-bold text-foreground truncate">
+                              {player.name}
+                            </h3>
+                          </div>
+                          
+                          {/* Stats */}
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
+                            <span>{player.records.length} {player.records.length === 1 ? 'record' : 'records'}</span>
+                            <Separator orientation="vertical" className="h-4" />
+                            <span>Hardest (AREDL): {player.hardestAredlRank !== null ? `#${player.hardestAredlRank}` : 'N/A'}</span>
+                          </div>
+                          
+                          {/* Records Preview */}
+                          {player.records.length > 0 && (
+                            <div className="text-xs text-muted-foreground mt-2">
+                              <span className="font-medium text-foreground">Top Records:</span>
+                              <span className="ml-1">
+                                {player.records.slice(0, 3).map((record, idx) => (
+                                  <span key={idx}>
+                                    {idx > 0 && ', '}
+                                    <span className="text-indigo-400">#{record.rank}</span> {record.levelName}
+                                  </span>
+                                ))}
+                                {player.records.length > 3 && <span>, +{player.records.length - 3} more</span>}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Points */}
+                        <div className="text-right ml-auto">
+                          <div className="text-2xl font-bold text-indigo-400">
+                            {player.totalPoints.toFixed(1)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">points</div>
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground">points</div>
                     </div>
                   </div>
                 );
