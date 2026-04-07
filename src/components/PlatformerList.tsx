@@ -213,13 +213,6 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
                     </div>
 
                     <div className="flex items-center gap-2 mt-2">
-                      {/* Pemonlist rank badge */}
-                      {level.pemonlistRank && (
-                        <div className="px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-xs text-purple-400">
-                          Pemonlist #{level.pemonlistRank}
-                        </div>
-                      )}
-                      
                       {/* Record count */}
                       {level.records.length > 0 && (
                         <div className="flex items-center gap-1 ml-auto">
