@@ -101,8 +101,8 @@ export function LevelList({ levels, listPage, changelog }: LevelListProps) {
             {filteredLevels.length > 0 ? (
               <div className={
                 viewMode === 'grid'
-                  ? 'grid grid-cols-1 gap-4 sm:gap-6'
-                  : 'space-y-4'
+                  ? 'grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6'
+                  : 'space-y-3'
               }>
                 {filteredLevels.map((level, index) => (
                   <div
@@ -113,6 +113,7 @@ export function LevelList({ levels, listPage, changelog }: LevelListProps) {
                     <LevelCard
                       level={level}
                       allLevels={levels}
+                      viewMode={viewMode}
                       onClick={() => setSelectedLevel(level)}
                     />
                   </div>
