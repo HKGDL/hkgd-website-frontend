@@ -17,7 +17,7 @@ type ViewMode = 'grid' | 'list';
 
 export function LevelList({ levels, listPage, changelog }: LevelListProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
 
   const filteredLevels = useMemo(() => {
