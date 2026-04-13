@@ -158,17 +158,6 @@ export function Leaderboard({ levels, onClose }: LeaderboardProps) {
                 Player rankings based on record points and completions
               </p>
             </div>
-            
-            {/* Back Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClose}
-              className="w-fit gap-2"
-            >
-              <X className="w-4 h-4" />
-              Back to Home
-            </Button>
           </div>
         </div>
 
