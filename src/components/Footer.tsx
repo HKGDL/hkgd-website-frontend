@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Skull, ExternalLink, Heart, Tag, Loader2 } from 'lucide-react';
+import { Skull, ExternalLink, Heart, Tag, Loader2, MessageCircleQuestion } from 'lucide-react';
 import type { WebsiteContent } from '@/types';
 import {
   Dialog,
@@ -12,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface FooterProps {
   content: WebsiteContent['footer'];
+  onOpenSuggestions?: () => void;
 }
 
 interface GitHubRelease {
@@ -27,7 +28,7 @@ interface GitHubRelease {
 const GITHUB_REPO_FRONTEND = 'HKGDL/hkgd-website-frontend';
 const GITHUB_REPO_API = 'HKGDL/HKGD-Website-API';
 
-export function Footer({ content }: FooterProps) {
+export function Footer({ content, onOpenSuggestions }: FooterProps) {
   const [latestVersion, setLatestVersion] = useState<string>('v0.0.0');
   const [apiVersion, setApiVersion] = useState<string>('v0.0.0');
   const [isFrontendOpen, setIsFrontendOpen] = useState(false);
@@ -309,6 +310,21 @@ export function Footer({ content }: FooterProps) {
               </span>
             </div>
           </div>
+
+          {/* Feedback/Suggestions Link */}
+          {onOpenSuggestions && (
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={onOpenSuggestions}
+                className="group flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 hover:border-indigo-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10"
+              >
+                <MessageCircleQuestion className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-indigo-300 group-hover:text-indigo-200">
+                  Enhancement or Issue? Click here
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </footer>
 

@@ -8,6 +8,7 @@ import { AdminCMSRefactored as AdminCMS } from '@/components/admin/AdminCMSRefac
 import { SubmitRecord } from '@/components/SubmitRecord';
 import { UserSettings } from '@/components/UserSettings';
 import { Leaderboard } from '@/components/Leaderboard';
+import { SuggestionsForm } from '@/components/SuggestionsForm';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { AprilFoolsPrank } from '@/components/AprilFoolsPrank';
 import { defaultContent, loadContent } from '@/data/content';
@@ -25,6 +26,7 @@ function App() {
   const [content, setContent] = useState<WebsiteContent>(defaultContent);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
 
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -214,7 +216,15 @@ if (isLoading) {
           {renderContent()}
         </main>
 
-        <Footer content={content.footer} />
+        <Footer content={content.footer} onOpenSuggestions={() => setIsSuggestionsOpen(true)} />
+
+        {/* Suggestions Form Modal */}
+        {isSuggestionsOpen && (
+          <SuggestionsForm
+            levels={levels}
+            onClose={() => setIsSuggestionsOpen(false)}
+          />
+        )}
 
         {/* Prerelease Alert */}
         <AlertDialog open={showPrerelease} onOpenChange={setShowPrerelease}>

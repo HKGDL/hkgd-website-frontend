@@ -100,3 +100,18 @@ export interface WebsiteContent {
     credits: string;
   };
 }
+
+export interface Suggestion {
+  id: string;
+  type: 'issue' | 'enhancement' | 'suggestion';
+  title: string;
+  description: string;
+  levelId?: string;
+  levelName?: string;
+  submittedBy?: string;
+  submittedAt: string;
+  status: 'pending' | 'approved' | 'rejected' | 'fixed' | 'in_progress';
+  adminNotes?: string;
+  resolvedAt?: string;
+  resolvedBy?: string;
+}

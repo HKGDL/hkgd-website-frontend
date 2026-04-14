@@ -312,4 +312,48 @@ export const api = {
     if (!response.ok) throw new Error('Failed to unban IP');
     return response.json();
   },
+
+  // Suggestions
+  getSuggestions: async () => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/suggestions`);
+    if (!response.ok) throw new Error('Failed to fetch suggestions');
+    return response.json();
+  },
+
+  getPendingSuggestions: async () => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/suggestions/pending`);
+    if (!response.ok) throw new Error('Failed to fetch pending suggestions');
+    return response.json();
+  },
+
+  createSuggestion: async (suggestion: any) => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/suggestions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(suggestion),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(errorData.error || 'Failed to submit suggestion');
+    }
+    return response.json();
+  },
+
+  updateSuggestion: async (id: string, data: { status: string; adminNotes?: string }) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/suggestions/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to update suggestion');
+    return response.json();
+  },
+
+  deleteSuggestion: async (id: string) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/suggestions/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete suggestion');
+    return response.json();
+  },
 };
