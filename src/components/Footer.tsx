@@ -320,7 +320,7 @@ export function Footer({ content, onOpenSuggestions }: FooterProps) {
               >
                 <MessageCircleQuestion className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
                 <span className="text-sm font-medium text-indigo-300 group-hover:text-indigo-200">
-                  Enhancement or Issue? Click here
+                  Enhancement or Issue? Click here(Broken)
                 </span>
               </button>
             </div>
