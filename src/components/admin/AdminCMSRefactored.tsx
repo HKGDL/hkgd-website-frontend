@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Lock, Settings, Trophy, Users, List, RefreshCw, LogOut, History, ChevronDown, Sliders } from 'lucide-react';
+import { X, Lock, Settings, Trophy, Users, List, RefreshCw, LogOut, History, ChevronDown, Sliders, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,6 +9,7 @@ import { AREDLSync } from './AREDLSync';
 import { LevelManagement } from './LevelManagement';
 import { ChangelogManagement } from './ChangelogManagement';
 import { SettingsManagement } from './SettingsManagement';
+import { SuggestionsManagement } from './SuggestionsManagement';
 import { EditLevelModal } from './EditLevelModal';
 import { AddLevelModal } from './AddLevelModal';
 import type { Level, Member, ChangelogEntry, PendingSubmission } from '@/types';
@@ -40,13 +41,14 @@ export function AdminCMSRefactored({
   onClose 
 }: AdminCMSProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdminType, setIsAdminType] = useState<boolean | 'suggestions'>(false);
   const [passwordError, setPasswordError] = useState(false);
   const [isBanned, setIsBanned] = useState(false);
   const [banRemainingTime, setBanRemainingTime] = useState<number>();
   const [attemptsRemaining, setAttemptsRemaining] = useState<number>(5);
-  const [activeTab, setActiveTab] = useState<'classic-levels' | 'platformer-levels' | 'pending' | 'sync' | 'changelog' | 'settings'>(() => {
+  const [activeTab, setActiveTab] = useState<'classic-levels' | 'platformer-levels' | 'pending' | 'sync' | 'changelog' | 'settings' | 'suggestions'>(() => {
     const savedTab = localStorage.getItem('admin-active-tab');
-    return (savedTab === 'classic-levels' || savedTab === 'platformer-levels' || savedTab === 'pending' || savedTab === 'sync' || savedTab === 'changelog' || savedTab === 'settings')
+    return (savedTab === 'classic-levels' || savedTab === 'platformer-levels' || savedTab === 'pending' || savedTab === 'sync' || savedTab === 'changelog' || savedTab === 'settings' || savedTab === 'suggestions')
       ? savedTab
       : 'classic-levels';
   });
@@ -74,6 +76,7 @@ export function AdminCMSRefactored({
         const result = await api.verifyToken();
         if (result.success) {
           setIsAuthenticated(true);
+          setIsAdminType(result.user?.isAdmin || false);
         }
       } catch (error) {
         console.log('Not authenticated');
@@ -119,6 +122,7 @@ export function AdminCMSRefactored({
       const result = await api.login(password);
       if (result.success) {
         setIsAuthenticated(true);
+        setIsAdminType(result.user?.isAdmin || false);
         setPasswordError(false);
         setIsBanned(false);
       } else {
@@ -580,6 +584,14 @@ export function AdminCMSRefactored({
                   Settings
                 </div>
               </SelectItem>
+              {isAdminType === 'suggestions' && (
+                <SelectItem value="suggestions">
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="w-4 h-4" />
+                    Suggestions
+                  </div>
+                </SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -637,6 +649,10 @@ export function AdminCMSRefactored({
 
             {activeTab === 'settings' && (
               <SettingsManagement />
+            )}
+
+            {isAdminType === 'suggestions' && activeTab === 'suggestions' && (
+              <SuggestionsManagement />
             )}
           </div>
         </ScrollArea>
