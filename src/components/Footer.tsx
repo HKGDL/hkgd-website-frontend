@@ -286,10 +286,20 @@ export function Footer({ content, onOpenSuggestions }: FooterProps) {
 
           {/* Bottom */}
           <div className="mt-12 pt-8 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <Heart className="w-4 h-4 text-red-400" />
-              Made with love by HKGD community
-            </p>
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <Heart className="w-4 h-4 text-red-400" />
+                Made with love by HKGD community
+              </p>
+              {onOpenSuggestions && (
+                <button
+                  onClick={onOpenSuggestions}
+                  className="text-sm text-muted-foreground/40 hover:text-muted-foreground/80 transition-all duration-300"
+                >
+                  Issues or Suggestion? Click here
+                </button>
+              )}
+            </div>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsFrontendOpen(true)}
@@ -310,18 +320,6 @@ export function Footer({ content, onOpenSuggestions }: FooterProps) {
               </span>
             </div>
           </div>
-
-          {/* Hidden suggestion link - very subtle */}
-          {onOpenSuggestions && (
-            <div className="mt-2 pt-2 flex justify-center">
-              <span
-                onClick={onOpenSuggestions}
-                className="text-[10px] text-muted-foreground/30 hover:text-muted-foreground/60 cursor-pointer select-none transition-all duration-300"
-              >
-                suggestion
-              </span>
-            </div>
-          )}
         </div>
       </footer>
 
