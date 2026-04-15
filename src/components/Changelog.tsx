@@ -13,8 +13,9 @@ interface ChangelogProps {
 }
 
 export function Changelog({ entries }: ChangelogProps) {
-  // Sort entries by date (newest first)
-  const sortedEntries = [...entries].sort((a, b) => {
+  // Filter out AREDL sync entries and sort by date (newest first)
+  const filteredEntries = entries.filter(entry => entry.change !== 'sync');
+  const sortedEntries = [...filteredEntries].sort((a, b) => {
     // Parse date format: YY/MM/DD
     const parseDate = (dateStr: string) => {
       const parts = dateStr.split('/');

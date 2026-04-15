@@ -46,6 +46,8 @@ export function ChangelogManagement({
   });
 
   const filteredChangelog = changelog.filter(entry => {
+    // Hide AREDL sync entries
+    if (entry.change === 'sync') return false;
     if (filter === 'all') return true;
     return entry.listType === filter;
   });
