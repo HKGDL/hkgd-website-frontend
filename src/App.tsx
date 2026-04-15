@@ -8,6 +8,7 @@ import { AdminCMSRefactored as AdminCMS } from '@/components/admin/AdminCMSRefac
 import { SubmitRecord } from '@/components/SubmitRecord';
 import { UserSettings } from '@/components/UserSettings';
 import { Leaderboard } from '@/components/Leaderboard';
+import { ModPage } from '@/components/ModPage';
 import { SuggestionsForm } from '@/components/SuggestionsForm';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { AprilFoolsPrank } from '@/components/AprilFoolsPrank';
@@ -15,7 +16,7 @@ import { defaultContent, loadContent } from '@/data/content';
 import { api } from '@/lib/api';
 import type { Level, ChangelogEntry, Member, Record, PendingSubmission, WebsiteContent } from '@/types';
 
-type Page = 'home' | 'list' | 'platformer' | 'leaderboard';
+type Page = 'home' | 'list' | 'platformer' | 'leaderboard' | 'mod';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -184,6 +185,8 @@ const handleSubmitRecord = async (levelId: string, record: Record, levelData?: P
         return <PlatformerList platformerPage={content.platformerPage} levels={levels} />;
       case 'leaderboard':
         return <Leaderboard levels={levels} onClose={() => handleNavigate('home')} />;
+      case 'mod':
+        return <ModPage />;
       default:
         return null;
     }

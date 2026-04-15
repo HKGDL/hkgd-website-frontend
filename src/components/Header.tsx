@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Skull, Menu, X, Trophy, List, Upload, Gamepad2, Shield, Settings } from 'lucide-react';
+import { Skull, Menu, X, Trophy, List, Upload, Gamepad2, Shield, Settings, Puzzle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
-  onNavigate: (page: 'home' | 'list' | 'platformer' | 'leaderboard') => void;
+  onNavigate: (page: 'home' | 'list' | 'platformer' | 'leaderboard' | 'mod') => void;
   currentPage: string;
   onSubmitRecord?: () => void;
   onOpenAdmin?: () => void;
@@ -49,6 +49,7 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
     { id: 'list', label: 'Demon List', icon: List },
     { id: 'platformer', label: 'Platformer', icon: Gamepad2 },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+    { id: 'mod', label: 'Mod', icon: Puzzle },
   ];
 
   return (
@@ -85,7 +86,7 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
               return (
                 <button
                   key={item.id}
-                  onClick={() => onNavigate(item.id as 'list' | 'platformer' | 'leaderboard')}
+                  onClick={() => onNavigate(item.id as 'list' | 'platformer' | 'leaderboard' | 'mod')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     currentPage === item.id
                       ? 'bg-indigo-500/20 text-indigo-400'
@@ -147,7 +148,7 @@ export function Header({ onNavigate, currentPage, onSubmitRecord, onOpenAdmin, o
                   <button
                     key={item.id}
                     onClick={() => {
-                      onNavigate(item.id as 'list' | 'platformer' | 'leaderboard');
+                      onNavigate(item.id as 'list' | 'platformer' | 'leaderboard' | 'mod');
                       setIsMobileMenuOpen(false);
                     }}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
