@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Skull, ExternalLink, Heart, Tag, Loader2, MessageCircleQuestion } from 'lucide-react';
+import { Skull, ExternalLink, Heart, Tag, Loader2 } from 'lucide-react';
 import type { WebsiteContent } from '@/types';
 import {
   Dialog,
@@ -311,18 +311,15 @@ export function Footer({ content, onOpenSuggestions }: FooterProps) {
             </div>
           </div>
 
-          {/* Feedback/Suggestions Link */}
+          {/* Hidden suggestion link - very subtle */}
           {onOpenSuggestions && (
-            <div className="mt-6 flex justify-center">
-              <button
+            <div className="mt-2 pt-2 flex justify-center">
+              <span
                 onClick={onOpenSuggestions}
-                className="group flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 hover:border-indigo-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10"
+                className="text-[10px] text-muted-foreground/30 hover:text-muted-foreground/60 cursor-pointer select-none transition-all duration-300"
               >
-                <MessageCircleQuestion className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
-                <span className="text-sm font-medium text-indigo-300 group-hover:text-indigo-200">
-                  Enhancement or Issue? Click here(Broken)
-                </span>
-              </button>
+                suggestion
+              </span>
             </div>
           )}
         </div>
