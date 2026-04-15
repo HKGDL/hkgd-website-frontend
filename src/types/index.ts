@@ -35,7 +35,7 @@ export interface ChangelogEntry {
   date: string;
   levelName: string;
   levelId: string;
-  change: 'added' | 'moved_up' | 'moved_down' | 'removed';
+  change: 'added' | 'moved_up' | 'moved_down' | 'removed' | 'sync';
   oldRank: number | null;
   newRank: number | null;
   description: string;
