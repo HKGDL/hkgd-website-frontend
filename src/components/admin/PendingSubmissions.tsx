@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, XCircle, Video, User, Calendar, Loader2, Award } from 'lucide-react';
+import { CheckCircle, XCircle, Video, User, Calendar, Loader2, Award, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { PendingSubmission, Level } from '@/types';
@@ -11,6 +11,7 @@ interface PendingSubmissionsProps {
   onReject: (submissionId: string) => void;
   onApproveAll: () => void;
   onRejectAll: () => void;
+  onRefresh?: () => void;
 }
 
 export function PendingSubmissions({ 
@@ -19,9 +20,11 @@ export function PendingSubmissions({
   onApprove, 
   onReject,
   onApproveAll,
-  onRejectAll 
+  onRejectAll,
+  onRefresh
 }: PendingSubmissionsProps) {
   const [approving, setApproving] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleApprove = async (submission: PendingSubmission) => {
     setApproving(submission.id);
@@ -32,34 +35,57 @@ export function PendingSubmissions({
     }
   };
 
+  const handleRefresh = async () => {
+    if (!onRefresh) return;
+    setRefreshing(true);
+    try {
+      await onRefresh();
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">
           Pending Submissions ({submissions.length})
         </h3>
-        {submissions.length > 0 && (
-          <div className="flex gap-2">
+        <div className="flex gap-2">
+          {onRefresh && (
             <Button
               variant="outline"
               size="sm"
-              onClick={onApproveAll}
-              className="text-green-600 hover:text-green-700"
+              onClick={handleRefresh}
+              disabled={refreshing}
             >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Approve All
+              <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRejectAll}
-              className="text-red-600 hover:text-red-700"
-            >
-              <XCircle className="w-4 h-4 mr-2" />
-              Reject All
-            </Button>
-          </div>
-        )}
+          )}
+          {submissions.length > 0 && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onApproveAll}
+                className="text-green-600 hover:text-green-700"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Approve All
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onRejectAll}
+                className="text-red-600 hover:text-red-700"
+              >
+                <XCircle className="w-4 h-4 mr-2" />
+                Reject All
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {submissions.length === 0 ? (

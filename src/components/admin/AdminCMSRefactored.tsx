@@ -631,6 +631,7 @@ export function AdminCMSRefactored({
                 onReject={handleRejectSubmission}
                 onApproveAll={handleApproveAll}
                 onRejectAll={handleRejectAll}
+                onRefresh={onReloadData}
               />
             )}
 
