@@ -115,3 +115,11 @@ export interface Suggestion {
   resolvedAt?: string;
   resolvedBy?: string;
 }
+
+export interface PlayerMapping {
+  id: number;
+  gameName: string;
+  dbName: string;
+  accountId: number | null;
+  createdAt: string;
+}

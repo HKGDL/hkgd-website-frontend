@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Lock, Settings, Trophy, Users, List, RefreshCw, LogOut, History, ChevronDown, Sliders, Lightbulb } from 'lucide-react';
+import { X, Lock, Settings, Trophy, Users, User, List, RefreshCw, LogOut, History, ChevronDown, Sliders, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +10,7 @@ import { LevelManagement } from './LevelManagement';
 import { ChangelogManagement } from './ChangelogManagement';
 import { SettingsManagement } from './SettingsManagement';
 import { SuggestionsManagement } from './SuggestionsManagement';
+import { PlayerMappings } from './PlayerMappings';
 import { EditLevelModal } from './EditLevelModal';
 import { AddLevelModal } from './AddLevelModal';
 import type { Level, Member, ChangelogEntry, PendingSubmission } from '@/types';
@@ -46,9 +47,9 @@ export function AdminCMSRefactored({
   const [isBanned, setIsBanned] = useState(false);
   const [banRemainingTime, setBanRemainingTime] = useState<number>();
   const [attemptsRemaining, setAttemptsRemaining] = useState<number>(5);
-  const [activeTab, setActiveTab] = useState<'classic-levels' | 'platformer-levels' | 'pending' | 'sync' | 'changelog' | 'settings' | 'suggestions'>(() => {
+  const [activeTab, setActiveTab] = useState<'classic-levels' | 'platformer-levels' | 'pending' | 'sync' | 'changelog' | 'settings' | 'suggestions' | 'mappings'>(() => {
     const savedTab = localStorage.getItem('admin-active-tab');
-    return (savedTab === 'classic-levels' || savedTab === 'platformer-levels' || savedTab === 'pending' || savedTab === 'sync' || savedTab === 'changelog' || savedTab === 'settings' || savedTab === 'suggestions')
+    return (savedTab === 'classic-levels' || savedTab === 'platformer-levels' || savedTab === 'pending' || savedTab === 'sync' || savedTab === 'changelog' || savedTab === 'settings' || savedTab === 'suggestions' || savedTab === 'mappings')
       ? savedTab
       : 'classic-levels';
   });
@@ -584,6 +585,12 @@ export function AdminCMSRefactored({
                   Settings
                 </div>
               </SelectItem>
+              <SelectItem value="mappings">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Player Mappings
+                </div>
+              </SelectItem>
               {isAdminType === 'suggestions' && (
                 <SelectItem value="suggestions">
                   <div className="flex items-center gap-2">
@@ -650,6 +657,10 @@ export function AdminCMSRefactored({
 
             {activeTab === 'settings' && (
               <SettingsManagement />
+            )}
+
+            {activeTab === 'mappings' && (
+              <PlayerMappings />
             )}
 
             {isAdminType === 'suggestions' && activeTab === 'suggestions' && (

@@ -356,4 +356,35 @@ export const api = {
     if (!response.ok) throw new Error('Failed to delete suggestion');
     return response.json();
   },
+
+  // Player Mappings
+  getPlayerMappings: async () => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/player-mappings`);
+    if (!response.ok) throw new Error('Failed to fetch player mappings');
+    return response.json();
+  },
+
+  getPlayerMapping: async (gameName: string) => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/player-mapping?gameName=${encodeURIComponent(gameName)}`);
+    if (!response.ok) throw new Error('Failed to fetch player mapping');
+    return response.json();
+  },
+
+  createPlayerMapping: async (mapping: { gameName: string; dbName: string; accountId?: number | null }) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/player-mapping`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mapping),
+    });
+    if (!response.ok) throw new Error('Failed to create player mapping');
+    return response.json();
+  },
+
+  deletePlayerMapping: async (id: number) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/player-mapping/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete player mapping');
+    return response.json();
+  },
 };
