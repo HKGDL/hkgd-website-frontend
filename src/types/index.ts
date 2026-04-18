@@ -63,6 +63,8 @@ export interface PendingSubmission {
   submittedBy: string;
   status: 'pending' | 'approved' | 'rejected';
   levelData?: Partial<Level>;
+  isPlatformer?: boolean;
+  adminDecidesDifficulty?: boolean;
 }
 
 export interface AREDLLevel {
