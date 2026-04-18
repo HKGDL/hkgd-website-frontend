@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, Edit3, Trash2, Crown } from 'lucide-react';
+import { Search, Plus, Edit3, Trash2, Crown, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -45,10 +45,31 @@ export function LevelManagement({
         <h3 className="text-lg font-semibold">
           {listType === 'classic' ? 'Classic Levels' : 'Platformer Levels'}
         </h3>
-        <Button onClick={onAddLevel} size="sm" className={listType === 'classic' ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-emerald-500 hover:bg-emerald-600'}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Level
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={onAddLevel} size="sm" className={listType === 'classic' ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-emerald-500 hover:bg-emerald-600'}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Level
+          </Button>
+          {listType === 'platformer' && (
+            <Button
+              onClick={() => {
+                const dragWindow = window.open(
+                  `${window.location.origin}/admin/drag-platformer`,
+                  'dragPlatformer',
+                  'width=800,height=600,scrollbars=yes,resizable=yes'
+                );
+                if (dragWindow) {
+                  dragWindow.focus();
+                }
+              }}
+              size="sm"
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <GripVertical className="w-4 h-4 mr-2" />
+              Open Drag Window
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="relative">
