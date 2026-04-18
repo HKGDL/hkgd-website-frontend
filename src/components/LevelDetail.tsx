@@ -73,12 +73,12 @@ export function LevelDetail({ level, allLevels, onClose }: LevelDetailProps) {
             {/* Rank Badges */}
             <div className="absolute bottom-4 left-4 flex items-center gap-3">
               <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <span className="text-2xl font-bold text-white">#{hkgdRank}</span>
+                <span className="text-2xl font-bold text-white">#{level.tags.some(tag => tag.toLowerCase() === 'platformer') ? (level.platformerRank || 1) : hkgdRank}</span>
               </div>
               <div className="px-4 py-2 rounded-xl bg-black/60 backdrop-blur-sm border border-white/10">
                 <span className="text-sm text-muted-foreground">
                   {level.tags.some(tag => tag.toLowerCase() === 'platformer')
-                    ? 'HKGD Rank'
+                    ? 'Platformer Rank'
                     : 'AREDL Rank'}
                 </span>
                 <p className="text-xl font-bold text-white">

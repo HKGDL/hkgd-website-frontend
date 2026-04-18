@@ -11,12 +11,9 @@ export function Hero({ content, levels, platformerLevels }: HeroProps) {
   // Classic levels are all levels that are not platformer levels
   const classicLevels = levels;
 
-  // Find hardest levels for each list
+  // Find hardest classic level for display
   const hardestClassic = classicLevels.length > 0
     ? classicLevels.sort((a, b) => (a.aredlRank || 9999) - (b.aredlRank || 9999))[0]
-    : null;
-  const hardestPlatformer = platformerLevels.length > 0
-    ? platformerLevels.sort((a, b) => (a.hkgdRank || 9999) - (b.hkgdRank || 9999))[0]
     : null;
 
   return (
@@ -88,17 +85,9 @@ export function Hero({ content, levels, platformerLevels }: HeroProps) {
           {/* Platformer Demons */}
           <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
             <div className="text-xs text-purple-400 uppercase tracking-wider mb-2">Platformer Demons</div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-purple-300">{platformerLevels.length}</div>
-                <div className="text-xs text-muted-foreground mt-1">Levels</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl sm:text-2xl font-bold text-purple-300">
-                  {hardestPlatformer ? `#${hardestPlatformer.aredlRank || hardestPlatformer.hkgdRank}` : 'N/A'}
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">Hardest</div>
-              </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-purple-300">{platformerLevels.length}</div>
+              <div className="text-xs text-muted-foreground mt-1">Levels</div>
             </div>
           </div>
         </div>
