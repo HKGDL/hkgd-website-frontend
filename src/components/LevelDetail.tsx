@@ -83,7 +83,7 @@ export function LevelDetail({ level, allLevels, onClose }: LevelDetailProps) {
                 </span>
                 <p className="text-xl font-bold text-white">
                   {level.tags.some(tag => tag.toLowerCase() === 'platformer')
-                    ? `#${level.hkgdRank}`
+                    ? `#${level.platformerRank || level.hkgdRank}`
                     : (level.aredlRank
                         ? `#${level.aredlRank}`
                         : 'N/A')}

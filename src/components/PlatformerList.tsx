@@ -17,7 +17,12 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
 
   const platformerLevels = useMemo(() => {
     return levels
-      .sort((a, b) => a.hkgdRank - b.hkgdRank);
+      .sort((a, b) => a.hkgdRank - b.hkgdRank)
+      .map((level, index) => ({
+        ...level,
+        // Add platformer-specific rank starting from 1
+        platformerRank: index + 1
+      }));
   }, [levels]);
 
   // Filter based on search query

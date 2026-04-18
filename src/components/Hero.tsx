@@ -16,7 +16,7 @@ export function Hero({ content, levels, platformerLevels }: HeroProps) {
     ? classicLevels.sort((a, b) => (a.aredlRank || 9999) - (b.aredlRank || 9999))[0]
     : null;
   const hardestPlatformer = platformerLevels.length > 0
-    ? platformerLevels.sort((a, b) => (a.aredlRank || 9999) - (b.aredlRank || 9999))[0]
+    ? platformerLevels.sort((a, b) => (a.hkgdRank || 9999) - (b.hkgdRank || 9999))[0]
     : null;
 
   return (

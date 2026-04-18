@@ -4,6 +4,9 @@ export interface Level {
   aredlRank: number | null;
   // Removed pemonlistRank - using manual ranking only
   // pemonlistRank?: number | null;
+  
+  // Platformer-specific rank (1-based index for platformer levels)
+  platformerRank?: number;
   name: string;
   creator: string;
   verifier: string;
