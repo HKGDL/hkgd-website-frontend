@@ -3,8 +3,7 @@ import { X, Lock, Settings, Trophy, Users, User, List, RefreshCw, LogOut, Histor
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import type { DropResult } from '@hello-pangea/dnd';
+import { css } from '@emotion/css';
 import { AdminAuth } from './AdminAuth';
 import { PendingSubmissions } from './PendingSubmissions';
 import { AREDLSync } from './AREDLSync';
@@ -164,15 +163,41 @@ export function AdminCMSRefactored({
     }
   };
 
-  // Drag-and-drop handlers for platformer ranking
-  const handlePlatformerDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+  // Native HTML5 drag-and-drop handlers for platformer ranking
+  const [draggedItem, setDraggedItem] = useState<Level | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, level: Level) => {
+    setDraggedItem(level);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', level.id);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    if (!draggedItem) return;
     
-    const items = Array.from(platformerLevelsForRanking);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    const newItems = [...platformerLevelsForRanking];
+    const draggedIndex = newItems.findIndex(item => item.id === draggedItem.id);
     
-    setPlatformerLevelsForRanking(items);
+    // Remove the dragged item
+    const [removedItem] = newItems.splice(draggedIndex, 1);
+    // Insert it at the new position
+    newItems.splice(index, 0, removedItem);
+    
+    setPlatformerLevelsForRanking(newItems);
+    setDraggedItem(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+    setDragOverIndex(null);
   };
 
   const handleSavePlatformerRanking = async () => {
@@ -694,46 +719,47 @@ export function AdminCMSRefactored({
                   </Button>
                 </div>
 
-                <DragDropContext onDragEnd={handlePlatformerDragEnd}>
-                  <Droppable droppableId="platformer-levels">
-                    {(provided) => (
+                <div className="space-y-3">
+                  {platformerLevelsForRanking.map((level, index) => (
+                    <div
+                      key={level.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, level)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDrop={(e) => handleDrop(e, index)}
+                      onDragEnd={handleDragEnd}
+                      className={css`
+                        flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 
+                        hover:bg-muted/30 transition-colors group
+                        ${dragOverIndex === index ? 'border-purple-500 bg-purple-500/10' : ''}
+                        ${draggedItem?.id === level.id ? 'opacity-80' : ''}
+                      `}
+                    >
                       <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="space-y-3"
+                        className={css`
+                          cursor-grab
+                          touch-action: none
+                          user-select: none
+                          active:cursor-grabbing
+                        `}
                       >
-                        {platformerLevels.map((level, index) => (
-                          <Draggable key={level.id} draggableId={level.id} index={index}>
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 hover:bg-muted/30 transition-colors group"
-                              >
-                                <div {...provided.dragHandleProps} className="cursor-grab">
-                                  <GripVertical className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
-                                </div>
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
-                                  <span className="font-bold text-white text-sm">{index + 1}</span>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-medium text-foreground truncate">{level.name}</div>
-                                  <div className="text-sm text-muted-foreground truncate">
-                                    by {level.creator} • ID: {level.levelId}
-                                  </div>
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {level.records.length} record{level.records.length !== 1 ? 's' : ''}
-                                </div>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
+                        <GripVertical className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
                       </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
+                        <span className="font-bold text-white text-sm">{index + 1}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-foreground truncate">{level.name}</div>
+                        <div className="text-sm text-muted-foreground truncate">
+                          by {level.creator} • ID: {level.levelId}
+                        </div>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {level.records.length} record{level.records.length !== 1 ? 's' : ''}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
