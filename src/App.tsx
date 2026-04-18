@@ -5,6 +5,7 @@ import { LevelList } from '@/components/LevelList';
 import { PlatformerList } from '@/components/PlatformerList';
 import { Footer } from '@/components/Footer';
 import { AdminCMSRefactored as AdminCMS } from '@/components/admin/AdminCMSRefactored';
+import { DragPlatformer } from '@/components/admin/DragPlatformer';
 import { SubmitRecord } from '@/components/SubmitRecord';
 import { UserSettings } from '@/components/UserSettings';
 import { Leaderboard } from '@/components/Leaderboard';
@@ -181,6 +182,11 @@ const handleSubmitRecord = async (levelId: string, record: Record, levelData?: P
   };
 
    const renderContent = () => {
+    // Check if we're in the drag platformer window
+    if (window.location.pathname === '/admin/drag-platformer') {
+      return <DragPlatformer />;
+    }
+
     switch (currentPage) {
       case 'home':
         return (
