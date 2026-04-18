@@ -4,12 +4,12 @@ import type { WebsiteContent, Level, Member } from '@/types';
 interface HeroProps {
   content: WebsiteContent['hero'];
   levels: Level[];
+  platformerLevels: Level[];
 }
 
-export function Hero({ content, levels }: HeroProps) {
-  // Separate classic and platformer levels
-  const classicLevels = levels.filter(level => !level.tags.includes('Platformer'));
-  const platformerLevels = levels.filter(level => level.tags.includes('Platformer'));
+export function Hero({ content, levels, platformerLevels }: HeroProps) {
+  // Classic levels are all levels that are not platformer levels
+  const classicLevels = levels;
 
   // Find hardest levels for each list
   const hardestClassic = classicLevels.length > 0
