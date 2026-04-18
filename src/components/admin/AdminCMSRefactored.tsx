@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { X, Lock, Settings, Trophy, Users, User, List, RefreshCw, LogOut, History, ChevronDown, Sliders, Lightbulb } from 'lucide-react';
+import { X, Lock, Settings, Trophy, Users, User, List, RefreshCw, LogOut, History, ChevronDown, Sliders, Lightbulb, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 import { AdminAuth } from './AdminAuth';
 import { PendingSubmissions } from './PendingSubmissions';
 import { AREDLSync } from './AREDLSync';
@@ -57,6 +59,10 @@ export function AdminCMSRefactored({
       ? savedTab
       : 'classic-levels';
   });
+  
+  // Drag-and-drop platformer ranking state
+  const [platformerLevelsForRanking, setPlatformerLevelsForRanking] = useState<Level[]>([]);
+  const [isSavingRanking, setIsSavingRanking] = useState(false);
 
   // Platformer level search state
   const [platformerSearchQuery, setPlatformerSearchQuery] = useState('');
@@ -157,6 +163,53 @@ export function AdminCMSRefactored({
       }
     }
   };
+
+  // Drag-and-drop handlers for platformer ranking
+  const handlePlatformerDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(platformerLevelsForRanking);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    setPlatformerLevelsForRanking(items);
+  };
+
+  const handleSavePlatformerRanking = async () => {
+    try {
+      setIsSavingRanking(true);
+      
+      // Update each level with its new HKGD rank
+      const updates = platformerLevelsForRanking.map((level, index) => {
+        const newHKGDRank = platformerLevels.length - index; // Higher rank = harder
+        return api.updatePlatformerLevel(level.id, {
+          ...level,
+          hkgdRank: newHKGDRank
+        });
+      });
+
+      await Promise.all(updates);
+      
+      // Refresh data after saving
+      const updatedLevels = await api.getPlatformerLevels();
+      onUpdatePlatformerLevels(updatedLevels);
+      setPlatformerLevelsForRanking(updatedLevels);
+      
+      alert('Platformer ranking saved successfully!');
+    } catch (error) {
+      console.error('Failed to save platformer ranking:', error);
+      alert('Failed to save platformer ranking. Check console for details.');
+    } finally {
+      setIsSavingRanking(false);
+    }
+  };
+
+  // Initialize platformer levels for ranking when tab is active
+  useEffect(() => {
+    if (activeTab === 'platformer-levels') {
+      setPlatformerLevelsForRanking([...platformerLevels].sort((a, b) => b.hkgdRank - a.hkgdRank));
+    }
+  }, [activeTab, platformerLevels]);
 
   const handleLogout = () => {
     api.logout();
@@ -624,6 +677,64 @@ export function AdminCMSRefactored({
                 platformerSearchResults={platformerSearchResults}
                 isSearchingPlatformer={isSearchingPlatformer}
               />
+            )}
+
+            {/* Platformer Levels Drag-and-Drop Ranking */}
+            {activeTab === 'platformer-levels' && (
+              <div className="mt-8 p-6 rounded-xl bg-muted/50 border border-border/50">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-foreground">Platformer Levels Ranking</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSavePlatformerRanking}
+                    disabled={isSavingRanking}
+                  >
+                    {isSavingRanking ? 'Saving...' : 'Save Ranking'}
+                  </Button>
+                </div>
+
+                <DragDropContext onDragEnd={handlePlatformerDragEnd}>
+                  <Droppable droppableId="platformer-levels">
+                    {(provided) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="space-y-3"
+                      >
+                        {platformerLevels.map((level, index) => (
+                          <Draggable key={level.id} draggableId={level.id} index={index}>
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 hover:bg-muted/30 transition-colors group"
+                              >
+                                <div {...provided.dragHandleProps} className="cursor-grab">
+                                  <GripVertical className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
+                                </div>
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
+                                  <span className="font-bold text-white text-sm">{index + 1}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-foreground truncate">{level.name}</div>
+                                  <div className="text-sm text-muted-foreground truncate">
+                                    by {level.creator} • ID: {level.levelId}
+                                  </div>
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {level.records.length} record{level.records.length !== 1 ? 's' : ''}
+                                </div>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </div>
             )}
 
             {activeTab === 'pending' && (
