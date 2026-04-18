@@ -236,7 +236,7 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
             </p>
             <div className="mt-6 p-4 rounded-lg bg-muted/30 border border-border/50 inline-block">
               <p className="text-sm text-muted-foreground">
-                Check the <a href="https://pemonlist.com/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">Pemonlist</a> for the full platformer demon list.
+                Check the admin panel to add platformer demon levels.
               </p>
             </div>
           </div>

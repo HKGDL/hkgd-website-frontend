@@ -2,7 +2,8 @@ export interface Level {
   id: string;
   hkgdRank: number;
   aredlRank: number | null;
-  pemonlistRank?: number | null;
+  // Removed pemonlistRank - using manual ranking only
+  // pemonlistRank?: number | null;
   name: string;
   creator: string;
   verifier: string;
