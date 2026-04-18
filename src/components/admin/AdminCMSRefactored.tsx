@@ -239,10 +239,19 @@ export function AdminCMSRefactored({
       if (!difficultyModalSubmission) return;
       
       const submission = difficultyModalSubmission;
+      console.log('Processing platformer submission:', submission);
       
       // If it's a new level, create it first
       if (levelData) {
-        await api.createPlatformerLevel(levelData);
+        console.log('Creating new platformer level with rank:', rank);
+        // Ensure the level is marked as platformer
+        const platformerLevelData = {
+          ...levelData,
+          isPlatformer: true,
+          hkgdRank: rank // Make sure rank is set
+        };
+        console.log('Platformer level data:', platformerLevelData);
+        await api.createPlatformerLevel(platformerLevelData);
         toast('✅ Created new platformer level');
       }
       
@@ -256,13 +265,16 @@ export function AdminCMSRefactored({
         cbf: submission.record.cbf
       };
       
+      console.log('Adding platformer record to level:', submission.levelId, recordData);
       await api.addPlatformerRecord(submission.levelId, recordData);
       toast('✅ Added platformer record');
       
       // Update submission status to approved
+      console.log('Updating submission status to approved');
       await api.updatePendingSubmission(submission.id, 'approved');
       
       // Refresh data
+      console.log('Refreshing data...');
       await onReloadData();
       
       toast(`✅ Platformer submission approved! Set to rank #${rank} in platformer list`);
