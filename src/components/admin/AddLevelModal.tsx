@@ -159,7 +159,8 @@ export function AddLevelModal({ levels, onClose, onAdded }: AddLevelModalProps) 
         id: levelId,
         hkgdRank: hkgdRank,
         aredlRank: selectedAREDLLevel?.position || null,
-        pemonlistRank: null,
+        // Removed pemonlistRank - using manual ranking only
+        // pemonlistRank: null,
         name: formData.name,
         creator: formData.creator,
         verifier: formData.verifier,

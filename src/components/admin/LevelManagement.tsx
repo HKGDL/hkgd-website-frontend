@@ -143,9 +143,9 @@ export function LevelManagement({
                           AREDL #{level.aredlRank}
                         </Badge>
                       )}
-                      {level.pemonlistRank && (
+                      {level.tags.includes('Platformer') && (
                         <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                          Platformer #{level.pemonlistRank}
+                          Platformer #{level.hkgdRank}
                         </Badge>
                       )}
                     </div>

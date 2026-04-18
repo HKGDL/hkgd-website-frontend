@@ -248,7 +248,8 @@ export function AdminCMSRefactored({
           id: submission.levelId,
           hkgdRank: hkgdRank,
           aredlRank: levelData.position || levelData.aredlRank || null,
-          pemonlistRank: levelData.pemonlistRank || null,
+          // Removed pemonlistRank - using manual ranking only
+          // pemonlistRank: levelData.pemonlistRank || null,
           name: levelData.name || submission.levelName || 'Unknown',
           creator: creator,
           verifier: verifier,
@@ -407,7 +408,8 @@ export function AdminCMSRefactored({
         id: `plat-${pemonlistLevel.level_id}`,
         hkgdRank: newHKGDRank,
         aredlRank: null,
-        pemonlistRank: pemonlistLevel.position,
+        // Removed pemonlistRank - using manual ranking only
+        // pemonlistRank: pemonlistLevel.position,
         name: pemonlistLevel.name,
         creator: pemonlistLevel.publisher || 'Unknown',
         verifier: pemonlistLevel.verifier || 'Unknown',

@@ -78,14 +78,12 @@ export function LevelDetail({ level, allLevels, onClose }: LevelDetailProps) {
               <div className="px-4 py-2 rounded-xl bg-black/60 backdrop-blur-sm border border-white/10">
                 <span className="text-sm text-muted-foreground">
                   {level.tags.some(tag => tag.toLowerCase() === 'platformer')
-                    ? 'Pemonlist Rank'
+                    ? 'HKGD Rank'
                     : 'AREDL Rank'}
                 </span>
                 <p className="text-xl font-bold text-white">
                   {level.tags.some(tag => tag.toLowerCase() === 'platformer')
-                    ? (level.pemonlistRank
-                        ? `#${level.pemonlistRank}`
-                        : 'N/A')
+                    ? `#${level.hkgdRank}`
                     : (level.aredlRank
                         ? `#${level.aredlRank}`
                         : 'N/A')}

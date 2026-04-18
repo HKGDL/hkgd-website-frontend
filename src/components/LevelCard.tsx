@@ -101,7 +101,7 @@ export function LevelCard({ level, allLevels, viewMode = 'grid', onClick }: Leve
           <div className="hidden sm:flex items-center gap-2 mt-2">
             <div className="px-2 py-0.5 rounded bg-muted/50 text-xs text-muted-foreground">
               {isPlatformer
-                ? (level.pemonlistRank ? `Pemonlist #${level.pemonlistRank}` : 'HKGD')
+                ? 'HKGD'
                 : (level.aredlRank ? `AREDL #${level.aredlRank}` : 'HKGD')}
             </div>
             {level.edelEnjoyment !== null && level.edelEnjoyment !== undefined && level.edelEnjoyment > 0 && (
@@ -143,9 +143,7 @@ export function LevelCard({ level, allLevels, viewMode = 'grid', onClick }: Leve
           <div className="hidden sm:block px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
             <span className="text-xs text-muted-foreground">
               {isPlatformer
-                ? (level.pemonlistRank
-                    ? `Pemonlist #${level.pemonlistRank}`
-                    : 'HKGD')
+                ? 'HKGD'
                 : (level.aredlRank
                     ? `AREDL #${level.aredlRank}`
                     : 'HKGD')}

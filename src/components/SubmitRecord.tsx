@@ -770,7 +770,8 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
         name: selectedLevelData.name,
         hkgdRank: selectedLevelData.position,
         aredlRank: isPlatformer ? null : selectedLevelData.position,
-        pemonlistRank: isPlatformer ? selectedLevelData.position : null,
+        // Removed pemonlistRank - using manual ranking only
+        // pemonlistRank: isPlatformer ? selectedLevelData.position : null,
         creator: selectedLevelData.publisher?.name || 'Unknown',
         verifier: isPlatformer 
           ? (selectedLevelData.verifier?.name || 'Unknown')
