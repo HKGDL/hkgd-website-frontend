@@ -15,13 +15,8 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
 
-  // Filter platformer levels that have records
   const platformerLevels = useMemo(() => {
     return levels
-      .filter(level => 
-        level.tags.some(tag => tag.toLowerCase() === 'platformer') && 
-        level.records.length > 0
-      )
       .sort((a, b) => a.hkgdRank - b.hkgdRank);
   }, [levels]);
 
@@ -237,7 +232,7 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
             <Gamepad2 className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-foreground mb-2">No Platformer Demons Found</h3>
             <p className="text-muted-foreground max-w-md mx-auto">
-              {searchQuery ? 'No demons match your search query.' : 'No platformer demons have been beaten by HKGD members yet.'}
+              {searchQuery ? 'No demons match your search query.' : platformerPage.emptyMessage}
             </p>
             <div className="mt-6 p-4 rounded-lg bg-muted/30 border border-border/50 inline-block">
               <p className="text-sm text-muted-foreground">

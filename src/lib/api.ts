@@ -132,6 +132,75 @@ export const api = {
     return response.json();
   },
 
+  // Platformer Levels
+  getPlatformerLevels: async () => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/platformer-levels`);
+    if (!response.ok) throw new Error('Failed to fetch platformer levels');
+    return response.json();
+  },
+
+  getPlatformerLevel: async (id: string) => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/platformer-levels/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch platformer level');
+    return response.json();
+  },
+
+  createPlatformerLevel: async (level: any) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/platformer-levels`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(level),
+    });
+    if (!response.ok) throw new Error('Failed to create platformer level');
+    return response.json();
+  },
+
+  updatePlatformerLevel: async (id: string, level: any) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/platformer-levels/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(level),
+    });
+    if (!response.ok) throw new Error('Failed to update platformer level');
+    return response.json();
+  },
+
+  deletePlatformerLevel: async (id: string) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/platformer-levels/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete platformer level');
+    return response.json();
+  },
+
+  addPlatformerRecord: async (levelId: string, record: any) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/platformer-levels/${levelId}/records`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record),
+    });
+    if (!response.ok) throw new Error('Failed to add platformer record');
+    return response.json();
+  },
+
+  updatePlatformerRecord: async (recordId: number, record: any) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/platformer-records/${recordId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record),
+    });
+    if (!response.ok) throw new Error('Failed to update platformer record');
+    return response.json();
+  },
+
+  deletePlatformerRecord: async (recordId: number) => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/platformer-records/${recordId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete platformer record');
+    return response.json();
+  },
+
   // Levels
   getLevels: async () => {
     const response = await fetchWithTimeout(`${API_BASE_URL}/levels`);

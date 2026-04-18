@@ -21,6 +21,7 @@ type Page = 'home' | 'list' | 'platformer' | 'leaderboard' | 'mod';
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [levels, setLevels] = useState<Level[]>([]);
+  const [platformerLevels, setPlatformerLevels] = useState<Level[]>([]);
   const [changelog, setChangelog] = useState<ChangelogEntry[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [pendingSubmissions, setPendingSubmissions] = useState<PendingSubmission[]>([]);
@@ -61,13 +62,15 @@ function App() {
   const loadAllData = async () => {
     try {
       setIsLoading(true);
-      const [levelsData, changelogData, membersData, submissionsData] = await Promise.all([
+      const [levelsData, platformerData, changelogData, membersData, submissionsData] = await Promise.all([
         api.getLevels(),
+        api.getPlatformerLevels(),
         api.getChangelog(),
         api.getMembers(),
         api.getPendingSubmissions(),
       ]);
       setLevels(levelsData);
+      setPlatformerLevels(platformerData);
       setChangelog(changelogData);
       setMembers(membersData);
       setPendingSubmissions(submissionsData);
@@ -165,6 +168,10 @@ const handleSubmitRecord = async (levelId: string, record: Record, levelData?: P
     setMembers(updatedMembers);
   };
 
+  const handleUpdatePlatformerLevels = (updatedLevels: Level[]) => {
+    setPlatformerLevels(updatedLevels);
+  };
+
   const handleUpdateChangelog = (updatedChangelog: ChangelogEntry[]) => {
     setChangelog(updatedChangelog);
   };
@@ -182,7 +189,7 @@ const handleSubmitRecord = async (levelId: string, record: Record, levelData?: P
       case 'list':
         return <LevelList levels={levels} listPage={content.listPage} changelog={changelog} />;
       case 'platformer':
-        return <PlatformerList platformerPage={content.platformerPage} levels={levels} />;
+        return <PlatformerList platformerPage={content.platformerPage} levels={platformerLevels} />;
       case 'leaderboard':
         return <Leaderboard levels={levels} onClose={() => handleNavigate('home')} />;
       case 'mod':
@@ -250,10 +257,12 @@ if (isLoading) {
         {isAdminOpen && (
           <AdminCMS
             levels={levels}
+            platformerLevels={platformerLevels}
             members={members}
             changelog={changelog}
             pendingSubmissions={pendingSubmissions}
             onUpdateLevels={handleUpdateLevels}
+            onUpdatePlatformerLevels={handleUpdatePlatformerLevels}
             onUpdateMembers={handleUpdateMembers}
             onUpdateChangelog={handleUpdateChangelog}
             onUpdatePending={handleUpdatePending}

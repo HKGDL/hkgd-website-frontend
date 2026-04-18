@@ -18,10 +18,12 @@ import { api } from '@/lib/api';
 
 interface AdminCMSProps {
   levels: Level[];
+  platformerLevels: Level[];
   members: Member[];
   changelog: ChangelogEntry[];
   pendingSubmissions: PendingSubmission[];
   onUpdateLevels: (levels: Level[]) => void;
+  onUpdatePlatformerLevels: (levels: Level[]) => void;
   onUpdateMembers: (members: Member[]) => void;
   onUpdateChangelog: (changelog: ChangelogEntry[]) => void;
   onUpdatePending: (pending: PendingSubmission[]) => void;
@@ -31,10 +33,12 @@ interface AdminCMSProps {
 
 export function AdminCMSRefactored({ 
   levels, 
+  platformerLevels,
   members, 
   changelog, 
   pendingSubmissions,
   onUpdateLevels, 
+  onUpdatePlatformerLevels,
   onUpdateMembers,
   onUpdateChangelog,
   onUpdatePending,
@@ -397,21 +401,18 @@ export function AdminCMSRefactored({
     try {
       console.log('Adding platformer level:', pemonlistLevel);
 
-      // Calculate HKGD rank for the new platformer level
-      const platformerLevels = levels.filter(l => l.aredlRank === null);
       const newHKGDRank = platformerLevels.length + 1;
 
-      // Create new platformer level
       const newLevel: Level = {
-        id: pemonlistLevel.level_id.toString(),
+        id: `plat-${pemonlistLevel.level_id}`,
         hkgdRank: newHKGDRank,
-        aredlRank: null, // Platformer levels don't have AREDL rank
+        aredlRank: null,
         pemonlistRank: pemonlistLevel.position,
         name: pemonlistLevel.name,
         creator: pemonlistLevel.publisher || 'Unknown',
         verifier: pemonlistLevel.verifier || 'Unknown',
         levelId: pemonlistLevel.level_id.toString(),
-        description: '', // Platformer levels don't have descriptions
+        description: '',
         thumbnail: pemonlistLevel.thumbnail || undefined,
         songId: undefined,
         songName: undefined,
@@ -423,14 +424,10 @@ export function AdminCMSRefactored({
         nlwTier: undefined
       };
 
-      await api.createLevel(newLevel);
+      await api.createPlatformerLevel(newLevel);
 
-      // Get levels above and below for changelog description
-      const sortedPlatformerLevels = levels
-        .filter(l => l.aredlRank === null)
-        .sort((a, b) => (a.hkgdRank || 9999) - (b.hkgdRank || 9999));
-      const levelAbove = sortedPlatformerLevels[newHKGDRank - 2];
-      const levelBelow = sortedPlatformerLevels[newHKGDRank - 1];
+      const levelAbove = platformerLevels[newHKGDRank - 2];
+      const levelBelow = platformerLevels[newHKGDRank - 1];
       
       let description = `${newLevel.name} was added at rank #${newHKGDRank}`;
       if (levelAbove && levelBelow) {
@@ -441,7 +438,6 @@ export function AdminCMSRefactored({
         description += `, above ${levelBelow.name}`;
       }
 
-      // Create changelog entry for the new platformer level
       const changelogEntry = {
         id: `changelog-${Date.now()}`,
         date: (() => {
@@ -458,12 +454,10 @@ export function AdminCMSRefactored({
       };
       await api.addChangelog(changelogEntry);
 
-      // Reload data to refresh the list
       await onReloadData();
 
       alert(`Successfully added ${newLevel.name} (Pemonlist #${pemonlistLevel.position})!`);
 
-      // Reset search
       setPlatformerSearchQuery('');
       setPlatformerSearchResults([]);
     } catch (error) {
@@ -617,7 +611,7 @@ export function AdminCMSRefactored({
 
             {activeTab === 'platformer-levels' && (
               <LevelManagement
-                levels={levels.filter(l => l.aredlRank === null)}
+                levels={platformerLevels}
                 onAddLevel={handleAddLevel}
                 onEditLevel={handleEditLevel}
                 onDeleteLevel={handleDeleteLevel}
