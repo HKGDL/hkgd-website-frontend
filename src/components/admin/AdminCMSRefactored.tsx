@@ -207,7 +207,7 @@ export function AdminCMSRefactored({
       
       // Update each level with its new HKGD rank
       const updates = platformerLevelsForRanking.map((level, index) => {
-        const newHKGDRank = platformerLevels.length - index; // Higher rank = harder
+        const newHKGDRank = index + 1; // Easier levels have lower ranks (1), harder have higher (22)
         return api.updatePlatformerLevel(level.id, {
           ...level,
           hkgdRank: newHKGDRank
