@@ -67,6 +67,7 @@ export function AdminCMSRefactored({
   const [platformerSearchQuery, setPlatformerSearchQuery] = useState('');
   const [platformerSearchResults, setPlatformerSearchResults] = useState<any[]>([]);
   const [isSearchingPlatformer, setIsSearchingPlatformer] = useState(false);
+  const [showDragModal, setShowDragModal] = useState(false);
 
   // Edit level state
   const [editingLevel, setEditingLevel] = useState<Level | null>(null);
@@ -709,14 +710,24 @@ export function AdminCMSRefactored({
               <div className="mt-8 p-6 rounded-xl bg-muted/50 border border-border/50">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-bold text-foreground">Platformer Levels Ranking</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSavePlatformerRanking}
-                    disabled={isSavingRanking}
-                  >
-                    {isSavingRanking ? 'Saving...' : 'Save Ranking'}
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => setShowDragModal(true)}
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      🎛️ Open Drag Modal
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSavePlatformerRanking}
+                      disabled={isSavingRanking}
+                    >
+                      {isSavingRanking ? 'Saving...' : 'Save Ranking'}
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
@@ -820,6 +831,91 @@ export function AdminCMSRefactored({
           onClose={() => setShowAddLevel(false)}
           onAdded={onReloadData}
         />
+      )}
+
+      {/* Drag Modal - Separate UI for reordering */}
+      {showDragModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-xl border border-border/50 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border/50">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-foreground">🎛️ Drag Mode - Reorder Platformer Levels</h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowDragModal(false)}
+                  className="h-8 w-8"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                📝 Click and drag the grip handles (⠿) to reorder levels. Click "Save Ranking" when finished.
+              </p>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-3">
+                {platformerLevelsForRanking.map((level, index) => (
+                  <div
+                    key={level.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, level)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDrop={(e) => handleDrop(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={css`
+                      flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 
+                      hover:bg-muted/30 transition-colors group
+                      ${dragOverIndex === index ? 'border-purple-500 bg-purple-500/10' : ''}
+                      ${draggedItem?.id === level.id ? 'opacity-80' : ''}
+                    `}
+                  >
+                    <div
+                      className={css`
+                        cursor-grab
+                        touch-action: none
+                        user-select: none
+                        active:cursor-grabbing
+                      `}
+                    >
+                      <GripVertical className="w-5 h-5 text-purple-400 group-hover:text-purple-300" />
+                    </div>
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
+                      <span className="font-bold text-white text-sm">{index + 1}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-foreground truncate">{level.name}</div>
+                      <div className="text-sm text-muted-foreground truncate">
+                        by {level.creator} • ID: {level.levelId}
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {level.records.length} record{level.records.length !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-border/50 flex items-center justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowDragModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                onClick={handleSavePlatformerRanking}
+                disabled={isSavingRanking}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isSavingRanking ? 'Saving...' : 'Save Ranking'}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
