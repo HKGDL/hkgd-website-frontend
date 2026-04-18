@@ -17,6 +17,7 @@ interface LevelManagementProps {
   onPlatformerSearchChange?: (query: string) => void;
   platformerSearchResults?: any[];
   isSearchingPlatformer?: boolean;
+  onOpenDragModal?: () => void;
 }
 
 export function LevelManagement({
@@ -29,7 +30,8 @@ export function LevelManagement({
   platformerSearchQuery = '',
   onPlatformerSearchChange,
   platformerSearchResults = [],
-  isSearchingPlatformer = false
+  isSearchingPlatformer = false,
+  onOpenDragModal = () => {},
 }: LevelManagementProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -52,21 +54,12 @@ export function LevelManagement({
           </Button>
           {listType === 'platformer' && (
             <Button
-              onClick={() => {
-                const dragWindow = window.open(
-                  `${window.location.origin}/admin/drag-platformer`,
-                  'dragPlatformer',
-                  'width=800,height=600,scrollbars=yes,resizable=yes'
-                );
-                if (dragWindow) {
-                  dragWindow.focus();
-                }
-              }}
+              onClick={() => onOpenDragModal()}
               size="sm"
               className="bg-purple-600 hover:bg-purple-700"
             >
               <GripVertical className="w-4 h-4 mr-2" />
-              Open Drag Window
+              Open Drag Modal
             </Button>
           )}
         </div>

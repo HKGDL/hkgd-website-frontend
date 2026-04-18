@@ -61,7 +61,6 @@ export function AdminCMSRefactored({
   
   // Drag-and-drop platformer ranking state
   const [platformerLevelsForRanking, setPlatformerLevelsForRanking] = useState<Level[]>([]);
-  const [isSavingRanking, setIsSavingRanking] = useState(false);
 
   // Platformer level search state
   const [platformerSearchQuery, setPlatformerSearchQuery] = useState('');
@@ -163,9 +162,11 @@ export function AdminCMSRefactored({
     }
   };
 
-  // Native HTML5 drag-and-drop handlers for platformer ranking
+  // Drag modal state (like Admin CMS pop-up style)
+  const [showDragModal, setShowDragModal] = useState(false);
   const [draggedItem, setDraggedItem] = useState<Level | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isSavingRanking, setIsSavingRanking] = useState(false);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, level: Level) => {
     setDraggedItem(level);
@@ -221,6 +222,7 @@ export function AdminCMSRefactored({
       setPlatformerLevelsForRanking(updatedLevels);
       
       alert('Platformer ranking saved successfully!');
+      setShowDragModal(false); // Close modal after saving
     } catch (error) {
       console.error('Failed to save platformer ranking:', error);
       alert('Failed to save platformer ranking. Check console for details.');
@@ -228,6 +230,13 @@ export function AdminCMSRefactored({
       setIsSavingRanking(false);
     }
   };
+
+  // Initialize platformer levels for ranking when modal opens
+  useEffect(() => {
+    if (showDragModal) {
+      setPlatformerLevelsForRanking([...platformerLevels].sort((a, b) => b.hkgdRank - a.hkgdRank));
+    }
+  }, [showDragModal, platformerLevels]);
 
   // Initialize platformer levels for ranking when tab is active
   useEffect(() => {
@@ -701,6 +710,7 @@ export function AdminCMSRefactored({
                 onPlatformerSearchChange={setPlatformerSearchQuery}
                 platformerSearchResults={platformerSearchResults}
                 isSearchingPlatformer={isSearchingPlatformer}
+                onOpenDragModal={() => setShowDragModal(true)}
               />
             )}
 
@@ -743,27 +753,10 @@ export function AdminCMSRefactored({
                   {platformerLevelsForRanking.map((level, index) => (
                     <div
                       key={level.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, level)}
-                      onDragOver={(e) => handleDragOver(e, index)}
-                      onDrop={(e) => handleDrop(e, index)}
-                      onDragEnd={handleDragEnd}
-                      className={css`
-                        flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 
-                        hover:bg-muted/30 transition-colors group
-                        ${dragOverIndex === index ? 'border-purple-500 bg-purple-500/10' : ''}
-                        ${draggedItem?.id === level.id ? 'opacity-80' : ''}
-                      `}
+                      className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 hover:bg-muted/30 transition-colors"
                     >
-                      <div
-                        className={css`
-                          cursor-grab
-                          touch-action: none
-                          user-select: none
-                          active:cursor-grabbing
-                        `}
-                      >
-                        <GripVertical className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
+                        <span className="font-bold text-white text-sm">{index + 1}</span>
                       </div>
                       <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
                         <span className="font-bold text-white text-sm">{index + 1}</span>
@@ -842,8 +835,90 @@ export function AdminCMSRefactored({
         />
       )}
 
-      {/* Remove drag modal state since we're using separate window */}
-      {/* {showDragModal && (...)} */}
+      {/* Drag Modal - appears when showDragModal is true */}
+      {showDragModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-xl border border-border/50 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border/50">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-foreground">🎛️ Drag Platformer Levels</h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowDragModal(false)}
+                  className="h-8 w-8"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                📝 Click and drag the grip handles (⠿) to reorder levels. Click "Save Ranking" when finished.
+              </p>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-3">
+                {platformerLevelsForRanking.map((level, index) => (
+                  <div
+                    key={level.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, level)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDrop={(e) => handleDrop(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={css`
+                      flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 
+                      hover:bg-muted/30 transition-colors group
+                      ${dragOverIndex === index ? 'border-purple-500 bg-purple-500/10' : ''}
+                      ${draggedItem?.id === level.id ? 'opacity-80' : ''}
+                    `}
+                  >
+                    <div
+                      className={css`
+                        cursor-grab
+                        touch-action: none
+                        user-select: none
+                        active:cursor-grabbing
+                      `}
+                    >
+                      <GripVertical className="w-5 h-5 text-purple-400 group-hover:text-purple-300" />
+                    </div>
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
+                      <span className="font-bold text-white text-sm">{index + 1}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-foreground truncate">{level.name}</div>
+                      <div className="text-sm text-muted-foreground truncate">
+                        by {level.creator} • ID: {level.levelId}
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {level.records.length} record{level.records.length !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-border/50 flex items-center justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowDragModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                onClick={handleSavePlatformerRanking}
+                disabled={isSavingRanking}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isSavingRanking ? 'Saving...' : 'Save Ranking'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
