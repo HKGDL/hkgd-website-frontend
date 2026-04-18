@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { css } from '@emotion/css';
+import { toast } from 'sonner';
 import { AdminAuth } from './AdminAuth';
 import { PendingSubmissions } from './PendingSubmissions';
 import { AREDLSync } from './AREDLSync';
@@ -14,6 +15,7 @@ import { SuggestionsManagement } from './SuggestionsManagement';
 import { PlayerMappings } from './PlayerMappings';
 import { EditLevelModal } from './EditLevelModal';
 import { AddLevelModal } from './AddLevelModal';
+import { PlatformerDifficultyModal } from './PlatformerDifficultyModal';
 import type { Level, Member, ChangelogEntry, PendingSubmission } from '@/types';
 import { api } from '@/lib/api';
 
@@ -58,6 +60,7 @@ export function AdminCMSRefactored({
       ? savedTab
       : 'classic-levels';
   });
+  const [difficultyModalSubmission, setDifficultyModalSubmission] = useState<PendingSubmission | null>(null);
   
   // Drag-and-drop platformer ranking state
   const [platformerLevelsForRanking, setPlatformerLevelsForRanking] = useState<Level[]>([]);
@@ -230,6 +233,46 @@ export function AdminCMSRefactored({
       setIsSavingRanking(false);
     }
   };
+  
+  const handlePlatformerDifficultySubmit = async (rank: number, levelData?: Partial<Level>) => {
+    try {
+      if (!difficultyModalSubmission) return;
+      
+      const submission = difficultyModalSubmission;
+      
+      // If it's a new level, create it first
+      if (levelData) {
+        await api.createPlatformerLevel(levelData);
+        toast('✅ Created new platformer level');
+      }
+      
+      // Add the record to the level
+      const recordData = {
+        player: submission.record.player,
+        date: submission.record.date,
+        videoUrl: submission.record.videoUrl,
+        fps: submission.record.fps,
+        attempts: submission.record.attempts,
+        cbf: submission.record.cbf
+      };
+      
+      await api.addPlatformerRecord(submission.levelId, recordData);
+      toast('✅ Added platformer record');
+      
+      // Update submission status to approved
+      await api.updatePendingSubmission(submission.id, 'approved');
+      
+      // Refresh data
+      await onReloadData();
+      
+      toast(`✅ Platformer submission approved! Set to rank #${rank} in platformer list`);
+      
+      setDifficultyModalSubmission(null);
+    } catch (error) {
+      console.error('Failed to approve platformer submission:', error);
+      toast(`❌ Failed to approve platformer submission: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
 
   // Initialize platformer levels for ranking when modal opens
   useEffect(() => {
@@ -254,6 +297,12 @@ export function AdminCMSRefactored({
   const handleApproveSubmission = async (submission: PendingSubmission) => {
     try {
       console.log('Approving submission:', submission);
+      
+      // Check if this is a platformer submission that requires admin difficulty placement
+      if (submission.isPlatformer && submission.adminDecidesDifficulty) {
+        setDifficultyModalSubmission(submission);
+        return; // Show modal instead of auto-approving
+      }
       
       // Check if level already exists in our database
       const existingLevel = levels.find(l => l.levelId === submission.levelId);
@@ -918,6 +967,16 @@ export function AdminCMSRefactored({
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Platformer Difficulty Placement Modal */}
+      {difficultyModalSubmission && (
+        <PlatformerDifficultyModal
+          submission={difficultyModalSubmission}
+          onClose={() => setDifficultyModalSubmission(null)}
+          onSubmit={handlePlatformerDifficultySubmit}
+          existingLevels={platformerLevels}
+        />
       )}
     </div>
   );
