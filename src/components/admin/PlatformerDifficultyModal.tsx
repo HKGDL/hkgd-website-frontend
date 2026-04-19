@@ -57,10 +57,10 @@ export function PlatformerDifficultyModal({
       return;
     }
     
-    // Check if rank is already taken
-    const rankTaken = existingLevels.some(l => l.hkgdRank === rank);
-    if (rankTaken && !isNewLevel) {
-      setError(`Rank ${rank} is already taken by another level`);
+    // Check if rank is already taken by a DIFFERENT level
+    const rankTaken = existingLevels.find(l => l.hkgdRank === rank && l.levelId !== submission.levelId);
+    if (rankTaken) {
+      setError(`Rank ${rank} is already taken by "${rankTaken.name}"`);
       return;
     }
     
@@ -70,7 +70,7 @@ export function PlatformerDifficultyModal({
     try {
       // Create level data if it's a new level
       const levelData = isNewLevel ? {
-        name: submission.levelName || `Unknown Level ${submission.levelId}`,
+        name: submission.levelName || submission.levelId,
         levelId: submission.levelId,
         hkgdRank: rank,
         creator: 'Unknown',
