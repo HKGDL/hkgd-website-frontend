@@ -16,11 +16,12 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
 
   const platformerLevels = useMemo(() => {
+    // Sort: rank 1 (easiest) first, highest rank (hardest) last
     return levels
       .sort((a, b) => a.hkgdRank - b.hkgdRank)
       .map((level, index) => ({
         ...level,
-        // Add platformer-specific rank starting from 1
+        // Add platformer-specific rank (1 = easiest, higher = harder)
         platformerRank: index + 1
       }));
   }, [levels]);

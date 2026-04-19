@@ -293,8 +293,9 @@ export function AdminCMSRefactored({
         cbf: submission.record.cbf
       };
       
-      console.log('Adding platformer record to level:', submission.levelId, recordData);
-      await api.addPlatformerRecord(submission.levelId, recordData);
+      const platformerLevelId = `plat-${submission.levelId}`;
+      console.log('Adding platformer record to level:', platformerLevelId, recordData);
+      await api.addPlatformerRecord(platformerLevelId, recordData);
       toast('✅ Added platformer record');
       
       console.log('Updating submission status to approved');
