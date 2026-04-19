@@ -675,6 +675,20 @@ export function AdminCMSRefactored({
     }
   };
 
+  const handleDeletePlatformerLevel = async (levelId: string) => {
+    if (confirm('Are you sure you want to delete this platformer level?')) {
+      try {
+        await api.deletePlatformerLevel(levelId);
+        const updatedPlatformerLevels = platformerLevels.filter(l => l.id !== levelId);
+        onUpdatePlatformerLevels(updatedPlatformerLevels);
+        alert('Platformer level deleted successfully!');
+      } catch (error) {
+        console.error('Failed to delete platformer level:', error);
+        alert('Failed to delete platformer level. Please try again.');
+      }
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <AdminAuth 
@@ -792,6 +806,7 @@ export function AdminCMSRefactored({
                 onAddLevel={handleAddLevel}
                 onEditLevel={handleEditLevel}
                 onDeleteLevel={handleDeleteLevel}
+                onDeletePlatformerLevel={handleDeletePlatformerLevel}
                 listType="platformer"
                 onAddPlatformerLevel={handleAddPlatformerLevel}
                 platformerSearchQuery={platformerSearchQuery}

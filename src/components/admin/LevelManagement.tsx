@@ -11,6 +11,7 @@ interface LevelManagementProps {
   onAddLevel: () => void;
   onEditLevel: (level: Level) => void;
   onDeleteLevel: (levelId: string) => void;
+  onDeletePlatformerLevel?: (levelId: string) => void;
   listType?: 'classic' | 'platformer';
   onAddPlatformerLevel?: (level: any) => void;
   platformerSearchQuery?: string;
@@ -25,6 +26,7 @@ export function LevelManagement({
   onAddLevel,
   onEditLevel,
   onDeleteLevel,
+  onDeletePlatformerLevel,
   listType = 'classic',
   onAddPlatformerLevel,
   platformerSearchQuery = '',
@@ -189,7 +191,7 @@ export function LevelManagement({
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => onDeleteLevel(level.id)}
+                      onClick={() => listType === 'platformer' && onDeletePlatformerLevel ? onDeletePlatformerLevel(level.id) : onDeleteLevel(level.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
