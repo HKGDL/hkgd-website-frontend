@@ -241,21 +241,28 @@ export function AdminCMSRefactored({
       const submission = difficultyModalSubmission;
       console.log('Processing platformer submission:', submission);
       
-      // If it's a new level, create it first
       if (levelData) {
         console.log('Creating new platformer level with rank:', rank);
-        // Ensure the level is marked as platformer
         const platformerLevelData = {
           ...levelData,
           isPlatformer: true,
-          hkgdRank: rank // Make sure rank is set
+          hkgdRank: rank
         };
         console.log('Platformer level data:', platformerLevelData);
         await api.createPlatformerLevel(platformerLevelData);
         toast('✅ Created new platformer level');
+      } else {
+        const existingLevel = platformerLevels.find(l => l.levelId === submission.levelId);
+        if (existingLevel && existingLevel.hkgdRank !== rank) {
+          console.log('Updating existing platformer level rank:', existingLevel.id, 'from', existingLevel.hkgdRank, 'to', rank);
+          await api.updatePlatformerLevel(existingLevel.id, {
+            ...existingLevel,
+            hkgdRank: rank
+          });
+          toast(`✅ Updated ${existingLevel.name} to rank #${rank}`);
+        }
       }
       
-      // Add the record to the level
       const recordData = {
         player: submission.record.player,
         date: submission.record.date,
@@ -269,11 +276,9 @@ export function AdminCMSRefactored({
       await api.addPlatformerRecord(submission.levelId, recordData);
       toast('✅ Added platformer record');
       
-      // Update submission status to approved
       console.log('Updating submission status to approved');
       await api.updatePendingSubmission(submission.id, 'approved');
       
-      // Refresh data
       console.log('Refreshing data...');
       await onReloadData();
       
@@ -310,10 +315,10 @@ export function AdminCMSRefactored({
     try {
       console.log('Approving submission:', submission);
       
-      // Check if this is a platformer submission that requires admin difficulty placement
-      if (submission.isPlatformer && submission.adminDecidesDifficulty) {
+      // Always show platformer difficulty modal for platformer submissions
+      if (submission.isPlatformer) {
         setDifficultyModalSubmission(submission);
-        return; // Show modal instead of auto-approving
+        return; // Show modal to assign rank
       }
       
       // Check if level already exists in our database
@@ -814,12 +819,22 @@ export function AdminCMSRefactored({
                   {platformerLevelsForRanking.map((level, index) => (
                     <div
                       key={level.id}
-                      className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 hover:bg-muted/30 transition-colors"
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, level)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDrop={(e) => handleDrop(e, index)}
+                      onDragEnd={handleDragEnd}
+                      className={css`
+                        flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 
+                        hover:bg-muted/30 transition-all group cursor-move
+                        ${dragOverIndex === index ? 'border-purple-500 bg-purple-500/20' : ''}
+                        ${draggedItem?.id === level.id ? 'opacity-50' : ''}
+                      `}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
-                        <span className="font-bold text-white text-sm">{index + 1}</span>
+                      <div className="cursor-grab">
+                        <GripVertical className="w-5 h-5 text-purple-400" />
                       </div>
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
                         <span className="font-bold text-white text-sm">{index + 1}</span>
                       </div>
                       <div className="flex-1 min-w-0">

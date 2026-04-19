@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, GripVertical } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { css } from '@emotion/css';
 import { api } from '@/lib/api';
@@ -10,6 +10,8 @@ export function DragPlatformer() {
   const [draggedItem, setDraggedItem] = useState<Level | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragItemRef = useRef<{ item: Level; index: number } | null>(null);
 
   // Load platformer levels on mount
   useEffect(() => {
@@ -25,14 +27,18 @@ export function DragPlatformer() {
     loadLevels();
   }, []);
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, level: Level) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, level: Level, index: number) => {
     setDraggedItem(level);
+    setIsDragging(true);
+    dragItemRef.current = { item: level, index };
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', level.id);
+    e.dataTransfer.effectAllowed = 'none';
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
     e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
     setDragOverIndex(index);
   };
 
@@ -43,18 +49,38 @@ export function DragPlatformer() {
     const newItems = [...platformerLevels];
     const draggedIndex = newItems.findIndex(item => item.id === draggedItem.id);
 
-    // Remove and reinsert at new position
+    if (draggedIndex === index) {
+      setDraggedItem(null);
+      setDragOverIndex(null);
+      setIsDragging(false);
+      return;
+    }
+
     const [removedItem] = newItems.splice(draggedIndex, 1);
     newItems.splice(index, 0, removedItem);
 
     setPlatformerLevels(newItems);
     setDraggedItem(null);
     setDragOverIndex(null);
+    setIsDragging(false);
+    dragItemRef.current = null;
   };
 
   const handleDragEnd = () => {
     setDraggedItem(null);
     setDragOverIndex(null);
+    setIsDragging(false);
+    dragItemRef.current = null;
+  };
+
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+    const newItems = [...platformerLevels];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= newItems.length) return;
+
+    const [item] = newItems.splice(index, 1);
+    newItems.splice(newIndex, 0, item);
+    setPlatformerLevels(newItems);
   };
 
   const handleSave = async () => {
@@ -113,28 +139,50 @@ export function DragPlatformer() {
             <div
               key={level.id}
               draggable
-              onDragStart={(e) => handleDragStart(e, level)}
+              onDragStart={(e) => handleDragStart(e, level, index)}
               onDragOver={(e) => handleDragOver(e, index)}
               onDrop={(e) => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
               className={css`
                 flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 
-                hover:bg-muted/30 transition-colors group
-                ${dragOverIndex === index ? 'border-purple-500 bg-purple-500/10' : ''}
-                ${draggedItem?.id === level.id ? 'opacity-80' : ''}
+                hover:bg-muted/30 transition-all group
+                ${dragOverIndex === index ? 'border-purple-500 bg-purple-500/20 scale-[1.02] shadow-lg shadow-purple-500/20' : ''}
+                ${draggedItem?.id === level.id ? 'opacity-50 scale-95' : ''}
+                ${isDragging && draggedItem?.id !== level.id ? 'cursor-grabbing' : ''}
               `}
             >
+              <div className="flex flex-col gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => { e.stopPropagation(); moveItem(index, 'up'); }}
+                  disabled={index === 0}
+                >
+                  <ArrowUp className="w-3 h-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => { e.stopPropagation(); moveItem(index, 'down'); }}
+                  disabled={index === platformerLevels.length - 1}
+                >
+                  <ArrowDown className="w-3 h-3" />
+                </Button>
+              </div>
               <div
                 className={css`
                   cursor-grab
                   touch-action: none
                   user-select: none
                   active:cursor-grabbing
+                  p-1 rounded hover:bg-purple-500/20 transition-colors
                 `}
               >
                 <GripVertical className="w-5 h-5 text-purple-400 group-hover:text-purple-300" />
               </div>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
                 <span className="font-bold text-white text-sm">{index + 1}</span>
               </div>
               <div className="flex-1 min-w-0">

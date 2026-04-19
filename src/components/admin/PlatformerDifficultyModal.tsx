@@ -26,12 +26,22 @@ export function PlatformerDifficultyModal({
   onSubmit,
   existingLevels
 }: PlatformerDifficultyModalProps) {
-  const [rank, setRank] = useState<number>(1);
-  const [isNewLevel, setIsNewLevel] = useState<boolean>(false);
+  const [rank, setRank] = useState<number>(() => {
+    const existingPlatformerRanks = existingLevels
+      .filter(l => l.hkgdRank !== undefined)
+      .map(l => l.hkgdRank as number)
+      .sort((a, b) => a - b);
+    
+    if (existingPlatformerRanks.length > 0) {
+      const maxRank = Math.max(...existingPlatformerRanks);
+      return maxRank + 1;
+    }
+    return 1;
+  });
+  const [isNewLevel, setIsNewLevel] = useState<boolean>(submission.isNewLevel || false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   
-  // Find suggested rank (next available after existing levels)
   const existingPlatformerRanks = existingLevels
     .filter(l => l.hkgdRank !== undefined)
     .map(l => l.hkgdRank as number)
