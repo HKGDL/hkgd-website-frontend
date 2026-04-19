@@ -112,7 +112,7 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
         setIsLoadingPlatformerDemons(true);
         try {
           const data = await api.getPlatformerDemons();
-          setPlatformerDemonsList(data.data || []);
+          setPlatformerDemonsList(data.demons || []);
         } catch (err) {
           console.error('Failed to fetch platformer demons:', err);
         } finally {
@@ -231,30 +231,116 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
       // Check if search term is numeric (level ID) or text (level name)
       const isNumeric = /^\d+$/.test(searchTerm);
       
-      if (demonListType === 'platformer') {
-        // Handle platformer demons using Pemonlist API
-        if (isNumeric) {
-          // Search by level ID in Pemonlist
-          const level = platformerDemonsList.find(l => l.level_id.toString() === searchTerm);
-          if (level) {
-            let creator = level.creator;
-            let verifier = level.verifier.name;
+if (demonListType === 'platformer') {
+        // Search local platformer levels first
+        const localLevel = platformerDemonsList.find(l => 
+          l.levelId?.toString() === searchTerm || 
+          l.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
-            // Fetch additional data from GDBrowser
-            let song = undefined;
-            try {
-              const gdbResponse = await fetch(`https://gdbrowser.com/api/level/${level.level_id}`, {
-                signal: AbortSignal.timeout(10000)
-              });
-              if (gdbResponse.ok) {
-                const gdbData = await gdbResponse.json();
-                if (gdbData.songName && gdbData.songAuthor) {
-                  song = {
-                    id: parseInt(gdbData.customSong || '0'),
-                    name: gdbData.songName,
-                    author: gdbData.songAuthor
-                  };
-                }
+        if (localLevel) {
+          setSelectedLevelData({
+            id: localLevel.levelId,
+            name: localLevel.name,
+            position: localLevel.hkgdRank || 0,
+            verifier: { id: 0, name: localLevel.verifier || 'Unknown', banned: false },
+            publisher: { id: 0, name: localLevel.creator || 'Unknown', banned: false },
+            level_id: localLevel.levelId,
+            song: localLevel.songId ? { id: parseInt(localLevel.songId), name: localLevel.songName, author: '' } : undefined,
+            tags: localLevel.tags || ['Platformer']
+          });
+          setSelectedLevelId(localLevel.levelId?.toString() || searchTerm);
+          return;
+        }
+
+        // Fallback to GDBrowser for new platformer level ID
+        if (isNumeric) {
+          const gdbResponse = await fetch(`https://gdbrowser.com/api/level/${searchTerm}`, {
+            signal: AbortSignal.timeout(10000)
+          });
+          if (!gdbResponse.ok) {
+            throw new Error('Platformer level not found');
+          }
+          const gdbData = await gdbResponse.json();
+
+          if (!gdbData.name) {
+            throw new Error('Level data not available');
+          }
+
+          // Verify it's a platformer level
+          if (!gdbData.platformer) {
+            throw new Error('Level is not a platformer level');
+          }
+
+          setSelectedLevelData({
+            id: parseInt(gdbData.id),
+            name: gdbData.name,
+            position: 0,
+            verifier: undefined,
+            publisher: { id: 0, name: gdbData.author || 'Unknown', banned: false },
+            level_id: parseInt(gdbData.id),
+            song: {
+              id: parseInt(gdbData.customSong || '0'),
+              name: gdbData.songName,
+              author: gdbData.songAuthor
+            },
+            tags: ['Platformer']
+          });
+          setSelectedLevelId(searchTerm);
+          return;
+        }
+
+        // Search by name in local levels
+        const nameMatch = platformerDemonsList.find(l => 
+          l.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        if (nameMatch) {
+          setSelectedLevelData({
+            id: nameMatch.levelId,
+            name: nameMatch.name,
+            position: nameMatch.hkgdRank || 0,
+            verifier: { id: 0, name: nameMatch.verifier || 'Unknown', banned: false },
+            publisher: { id: 0, name: nameMatch.creator || 'Unknown', banned: false },
+            level_id: nameMatch.levelId,
+            tags: nameMatch.tags || ['Platformer']
+          });
+          setSelectedLevelId(nameMatch.levelId?.toString() || searchTerm);
+          return;
+        }
+
+        // Try text search via GDBrowser if local fails
+        if (!isNumeric) {
+          const gdbResponse = await fetch(`https://gdbrowser.com/api/search?q=${encodeURIComponent(searchTerm)}`, {
+            signal: AbortSignal.timeout(10000)
+          });
+          if (!gdbResponse.ok) {
+            throw new Error('Platformer level not found');
+          }
+          const gdbResults = await gdbResponse.json();
+          if (!gdbResults.results?.length) {
+            throw new Error('No matching platformer level found');
+          }
+
+          // Filter for platformer levels only
+          const platformerResults = gdbResults.results.filter((l: any) => l.platformer === true);
+          if (platformerResults.length === 0) {
+            throw new Error('No platformer levels found with that name. Try searching for a platformer level.');
+          }
+
+          const gdbData = platformerResults[0];
+
+          setSelectedLevelData({
+            id: parseInt(gdbData.id),
+            name: gdbData.name,
+            position: 0,
+            verifier: undefined,
+            publisher: { id: 0, name: gdbData.author || 'Unknown', banned: false },
+            level_id: parseInt(gdbData.id),
+            tags: ['Platformer']
+          });
+          setSelectedLevelId(gdbData.id);
+          return;
+        }
               }
             } catch (gdbError) {
               console.warn('Failed to fetch song from GDBrowser:', gdbError);
@@ -326,7 +412,13 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
             throw new Error('No platformer levels found with that name');
           }
 
-          const level = gdbData[0];
+          // Filter for platformer levels only
+          const platformerResults = gdbData.filter((l: any) => l.platformer === true);
+          if (platformerResults.length === 0) {
+            throw new Error('No platformer levels found with that name. Try searching for a platformer level.');
+          }
+
+          const level = platformerResults[0];
           setSelectedLevelData({
             id: parseInt(level.id),
             name: level.name,
@@ -968,7 +1060,7 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
                                 <Badge variant="secondary" className="text-xs">ID: {selectedLevelData.level_id}</Badge>
                                 <Badge variant="secondary" className="text-xs">
                                   {demonListType === 'platformer' 
-                                    ? `Pemonlist #${selectedLevelData.position}`
+                                    ? `Rank #${selectedLevelData.position}`
                                     : (selectedLevelData.position <= 150 ? `Pointercrate #${selectedLevelData.position}` : `AREDL #${selectedLevelData.position}`)
                                   }
                                 </Badge>
