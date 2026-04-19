@@ -231,51 +231,10 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
       // Check if search term is numeric (level ID) or text (level name)
       const isNumeric = /^\d+$/.test(searchTerm);
       
-      if (demonListType === 'platformer') {
-        // Handle platformer demons using Pemonlist API
+if (demonListType === 'platformer') {
+        // Use GDBrowser API first for platformer levels
         if (isNumeric) {
-          // Search by level ID in Pemonlist
-          const level = platformerDemonsList.find(l => l.level_id.toString() === searchTerm);
-          if (level) {
-            let creator = level.creator;
-            let verifier = level.verifier.name;
-
-            // Fetch additional data from GDBrowser
-            let song = undefined;
-            try {
-              const gdbResponse = await fetch(`https://gdbrowser.com/api/level/${level.level_id}`, {
-                signal: AbortSignal.timeout(10000)
-              });
-              if (gdbResponse.ok) {
-                const gdbData = await gdbResponse.json();
-                if (gdbData.songName && gdbData.songAuthor) {
-                  song = {
-                    id: parseInt(gdbData.customSong || '0'),
-                    name: gdbData.songName,
-                    author: gdbData.songAuthor
-                  };
-                }
-              }
-            } catch (gdbError) {
-              console.warn('Failed to fetch song from GDBrowser:', gdbError);
-            }
-
-            setSelectedLevelData({
-              id: level.level_id,
-              name: level.name,
-              position: level.placement,
-              video: `https://www.youtube.com/watch?v=${level.video_id}`,
-              verifier: { id: 0, name: verifier, banned: false },
-              publisher: { id: 0, name: creator, banned: false },
-              level_id: level.level_id,
-              song: song,
-              tags: ['Platformer']
-            });
-            setSelectedLevelId(searchTerm);
-            return;
-          }
-
-          // Fallback to GDBrowser for platformer level ID
+          // Fetch from GDBrowser by level ID
           const gdbResponse = await fetch(`https://gdbrowser.com/api/level/${searchTerm}`, {
             signal: AbortSignal.timeout(10000)
           });
@@ -288,6 +247,11 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
             throw new Error('Level data not available');
           }
 
+          // Verify it's a platformer level
+          if (!gdbData.platformer) {
+            throw new Error('Level is not a platformer level');
+          }
+
           setSelectedLevelData({
             id: parseInt(gdbData.id),
             name: gdbData.name,
@@ -295,54 +259,52 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
             verifier: undefined,
             publisher: { id: 0, name: gdbData.author || 'Unknown', banned: false },
             level_id: parseInt(gdbData.id),
-            song: {
+            song: gdbData.songName ? {
               id: parseInt(gdbData.customSong || '0'),
               name: gdbData.songName,
-              author: gdbData.songAuthor
-            },
+              author: gdbData.songAuthor || ''
+            } : undefined,
             tags: ['Platformer']
           });
           setSelectedLevelId(searchTerm);
-        } else {
-          // Search by level name in Pemonlist
-          const results = platformerDemonsList.filter(l => 
-            l.name.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-          if (results.length > 0) {
-            setSearchResults(results);
-            return;
-          }
-
-          // Fallback to GDBrowser for platformer level name
-          const gdbResponse = await fetch(`https://gdbrowser.com/api/search?q=${encodeURIComponent(searchTerm)}`, {
-            signal: AbortSignal.timeout(10000)
-          });
-          if (!gdbResponse.ok) {
-            throw new Error('Platformer level not found');
-          }
-          const gdbData = await gdbResponse.json();
-
-          if (!gdbData.length || !gdbData[0].name) {
-            throw new Error('No platformer levels found with that name');
-          }
-
-          const level = gdbData[0];
-          setSelectedLevelData({
-            id: parseInt(level.id),
-            name: level.name,
-            position: 0,
-            verifier: undefined,
-            publisher: { id: 0, name: level.author || 'Unknown', banned: false },
-            level_id: parseInt(level.id),
-            song: {
-              id: parseInt(level.customSong || '0'),
-              name: level.songName,
-              author: level.songAuthor
-            },
-            tags: ['Platformer']
-          });
-          setSelectedLevelId(level.id.toString());
+          return;
         }
+
+        // Search by name via GDBrowser
+        const gdbResponse = await fetch(`https://gdbrowser.com/api/search?q=${encodeURIComponent(searchTerm)}`, {
+          signal: AbortSignal.timeout(10000)
+        });
+        if (!gdbResponse.ok) {
+          throw new Error('Platformer level not found');
+        }
+        const gdbResults = await gdbResponse.json();
+
+        if (!gdbResults.length) {
+          throw new Error('No platformer levels found');
+        }
+
+        // Filter for platformer only
+        const platformerResult = gdbResults.find((l: any) => l.platformer === true);
+        if (!platformerResult) {
+          throw new Error('No platformer levels found with that name');
+        }
+
+        setSelectedLevelData({
+          id: parseInt(platformerResult.id),
+          name: platformerResult.name,
+          position: 0,
+          verifier: undefined,
+          publisher: { id: 0, name: platformerResult.author || 'Unknown', banned: false },
+          level_id: parseInt(platformerResult.id),
+          song: platformerResult.songName ? {
+            id: parseInt(platformerResult.customSong || '0'),
+            name: platformerResult.songName,
+            author: platformerResult.songAuthor || ''
+          } : undefined,
+          tags: ['Platformer']
+        });
+        setSelectedLevelId(platformerResult.id.toString());
+        return;
       } else {
         // Handle classic extreme demons using AREDL API
         if (isNumeric) {
