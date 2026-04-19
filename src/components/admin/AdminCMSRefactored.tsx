@@ -241,26 +241,47 @@ export function AdminCMSRefactored({
       const submission = difficultyModalSubmission;
       console.log('Processing platformer submission:', submission);
       
-      if (levelData) {
-        console.log('Creating new platformer level with rank:', rank);
+      // Check if level already exists in platformer list
+      let existingLevel = platformerLevels.find(l => l.levelId === submission.levelId);
+      
+      if (levelData || !existingLevel) {
+        // Create or update level
         const platformerLevelData = {
-          ...levelData,
-          isPlatformer: true,
-          hkgdRank: rank
+          id: `plat-${submission.levelId}`,
+          hkgdRank: rank,
+          aredlRank: null,
+          name: levelData?.name || levelData?.levelId || submission.levelName || submission.levelId,
+          creator: levelData?.creator || 'Unknown',
+          verifier: levelData?.verifier || 'Unknown',
+          levelId: submission.levelId,
+          description: levelData?.description || '',
+          thumbnail: levelData?.thumbnail,
+          songId: null,
+          songName: null,
+          tags: ['Platformer'],
+          dateAdded: new Date().toISOString(),
+          records: []
         };
-        console.log('Platformer level data:', platformerLevelData);
-        await api.createPlatformerLevel(platformerLevelData);
-        toast('✅ Created new platformer level');
-      } else {
-        const existingLevel = platformerLevels.find(l => l.levelId === submission.levelId);
-        if (existingLevel && existingLevel.hkgdRank !== rank) {
+        
+        if (existingLevel) {
           console.log('Updating existing platformer level rank:', existingLevel.id, 'from', existingLevel.hkgdRank, 'to', rank);
           await api.updatePlatformerLevel(existingLevel.id, {
             ...existingLevel,
             hkgdRank: rank
           });
           toast(`✅ Updated ${existingLevel.name} to rank #${rank}`);
+        } else {
+          console.log('Creating new platformer level with rank:', rank);
+          await api.createPlatformerLevel(platformerLevelData);
+          toast('✅ Created new platformer level');
         }
+      } else if (existingLevel && existingLevel.hkgdRank !== rank) {
+        console.log('Updating existing platformer level rank:', existingLevel.id, 'from', existingLevel.hkgdRank, 'to', rank);
+        await api.updatePlatformerLevel(existingLevel.id, {
+          ...existingLevel,
+          hkgdRank: rank
+        });
+        toast(`✅ Updated ${existingLevel.name} to rank #${rank}`);
       }
       
       const recordData = {
