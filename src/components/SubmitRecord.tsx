@@ -914,9 +914,22 @@ if (demonListType === 'platformer') {
                       setSearchQuery(e.target.value);
                       setSearchResults([]); // Clear previous search results when typing
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        fetchLevelFromAPI(searchQuery);
+                      }
+                    }}
                     placeholder={`Enter level ID or name to search ${demonListType === 'classic' ? 'Extreme Demons' : 'Platformer Demons'}...`}
                     className="pl-10"
                   />
+                  <Button
+                    size="sm"
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
+                    onClick={() => fetchLevelFromAPI(searchQuery)}
+                    disabled={!searchQuery.trim()}
+                  >
+                    Search
+                  </Button>
                 </div>
 
                 {apiError && (
