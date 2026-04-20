@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, ArrowUp, ArrowDown } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { api } from '@/lib/api';
@@ -9,6 +9,8 @@ export function DragPlatformer() {
   const [platformerLevels, setPlatformerLevels] = useState<Level[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const dragItemRef = useRef<Level | null>(null);
 
   useEffect(() => {
     const loadLevels = async () => {
@@ -30,6 +32,7 @@ export function DragPlatformer() {
       )
     : platformerLevels;
 
+  // Button move
   const moveItem = (index: number, direction: 'up' | 'down') => {
     const newIndex = direction === 'up' ? index - 1 : index + 1;
     if (newIndex < 0 || newIndex >= platformerLevels.length) return;
@@ -38,6 +41,35 @@ export function DragPlatformer() {
     const [item] = newItems.splice(index, 1);
     newItems.splice(newIndex, 0, item);
     setPlatformerLevels(newItems);
+  };
+
+  // Drag handlers
+  const handleDragStart = (e: React.DragEvent, level: Level, index: number) => {
+    dragItemRef.current = level;
+    setDragIdx(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (dragIdx === null || dragIdx === index) return;
+    
+    const newItems = [...platformerLevels];
+    const dragItem = dragItemRef.current;
+    if (!dragItem) return;
+    
+    const oldIdx = newItems.findIndex(l => l.id === dragItem.id);
+    if (oldIdx === -1) return;
+    
+    const [item] = newItems.splice(oldIdx, 1);
+    newItems.splice(index, 0, item);
+    setPlatformerLevels(newItems);
+    setDragIdx(index);
+  };
+
+  const handleDragEnd = () => {
+    dragItemRef.current = null;
+    setDragIdx(null);
   };
 
   const handleSave = async () => {
@@ -79,8 +111,16 @@ export function DragPlatformer() {
           {filteredLevels.map((level, index) => (
             <div
               key={level.id}
-              className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border/50"
+              draggable
+              onDragStart={(e) => handleDragStart(e, level, index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragEnd={handleDragEnd}
+              className={`flex items-center gap-3 p-3 rounded-lg bg-card border border-border/50 cursor-move ${
+                dragIdx === index ? 'opacity-50' : ''
+              }`}
             >
+              <GripVertical className="w-4 h-4 text-muted-foreground" />
+              
               <Button
                 variant="ghost"
                 size="icon"
