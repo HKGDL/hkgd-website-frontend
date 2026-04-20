@@ -1,9 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { X, GripVertical, ArrowUp, ArrowDown, SortAsc, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { css } from '@emotion/css';
 import { api } from '@/lib/api';
 import type { Level } from '@/types';
+
+type SortOption = 'hkgdRank' | 'name' | 'creator';
 
 export function DragPlatformer() {
   const [platformerLevels, setPlatformerLevels] = useState<Level[]>([]);
@@ -11,6 +14,8 @@ export function DragPlatformer() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>('hkgdRank');
+  const [searchQuery, setSearchQuery] = useState('');
   const dragItemRef = useRef<{ item: Level; index: number } | null>(null);
 
   // Load platformer levels on mount
@@ -73,6 +78,33 @@ export function DragPlatformer() {
     dragItemRef.current = null;
   };
 
+  // Sort and filter levels
+  const sortedAndFilteredLevels = useMemo(() => {
+    let result = [...platformerLevels];
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(level =>
+        level.name.toLowerCase().includes(query) ||
+        (level.creator && level.creator.toLowerCase().includes(query))
+      );
+    }
+
+    // Apply sorting
+    result.sort((a, b) => {
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name);
+      } else if (sortBy === 'creator') {
+        return (a.creator || '').localeCompare(b.creator || '');
+      }
+      // Default: hkgdRank
+      return (b.hkgdRank || 0) - (a.hkgdRank || 0);
+    });
+
+    return result;
+  }, [platformerLevels, sortBy, searchQuery]);
+
   const moveItem = (index: number, direction: 'up' | 'down') => {
     const newItems = [...platformerLevels];
     const newIndex = direction === 'up' ? index - 1 : index + 1;
@@ -134,8 +166,33 @@ export function DragPlatformer() {
           </p>
         </div>
 
+        {/* Search and Sort Controls */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name or creator..."
+              className="pl-10 bg-card"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <SortAsc className="w-4 h-4 text-muted-foreground" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="h-10 px-3 rounded-md border border-input bg-card text-foreground"
+            >
+              <option value="hkgdRank">HKGD Rank</option>
+              <option value="name">Name</option>
+              <option value="creator">Creator</option>
+            </select>
+          </div>
+        </div>
+
         <div className="space-y-3 mb-8">
-          {platformerLevels.map((level, index) => (
+          {sortedAndFilteredLevels.map((level, index) => (
             <div
               key={level.id}
               draggable
