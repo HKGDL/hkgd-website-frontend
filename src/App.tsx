@@ -109,7 +109,9 @@ const handleSubmitRecord = async (levelId: string, record: Record, levelData?: P
         submittedAt: formatDate(new Date()),
         submittedBy: record.player,
         status: 'pending',
-        levelData: levelData
+        levelData: levelData,
+        isPlatformer: levelData?.tags?.some(t => t.toLowerCase() === 'platformer'),
+        adminDecidesDifficulty: isNewLevel
       };
 
       console.log('Submitting record with data:', pendingSubmission);
