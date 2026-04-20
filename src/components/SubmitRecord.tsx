@@ -232,10 +232,10 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
       const isNumeric = /^\d+$/.test(searchTerm);
       
 if (demonListType === 'platformer') {
-        // Use GDBrowser API first for platformer levels
+        // Use our API proxy for GDBrowser
         if (isNumeric) {
-          // Fetch from GDBrowser by level ID
-          const gdbResponse = await fetch(`https://gdbrowser.com/api/level/${searchTerm}`, {
+          // Fetch from GDBrowser via our API proxy
+          const gdbResponse = await fetch(`${API_BASE_URL}/gdbrowser/level/${searchTerm}`, {
             signal: AbortSignal.timeout(10000)
           });
           if (!gdbResponse.ok) {
@@ -271,7 +271,7 @@ if (demonListType === 'platformer') {
         }
 
         // Search by name via GDBrowser
-        const gdbResponse = await fetch(`https://gdbrowser.com/api/search?q=${encodeURIComponent(searchTerm)}`, {
+        const gdbResponse = await fetch(`${API_BASE_URL}/gdbrowser/search?q=${encodeURIComponent(searchTerm)}`, {
           signal: AbortSignal.timeout(10000)
         });
         if (!gdbResponse.ok) {
