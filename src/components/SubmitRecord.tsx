@@ -244,8 +244,11 @@ if (demonListType === 'platformer') {
           const gdbData = await gdbResponse.json();
 
           // Handle both API response formats
+          console.log('GDB data:', gdbData);
           const levelName = gdbData.cache_level_name || gdbData.name;
+          console.log('Level name:', levelName);
           if (!levelName) {
+            console.log('No level name found in data');
             throw new Error('Level data not available');
           }
 
