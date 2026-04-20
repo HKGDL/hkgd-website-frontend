@@ -105,23 +105,37 @@ export function DragPlatformer() {
     return result;
   }, [platformerLevels, sortBy, searchQuery]);
 
-  const moveItem = (index: number, direction: 'up' | 'down') => {
-    const newItems = [...platformerLevels];
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= newItems.length) return;
+  // Move item in the currently displayed order (using display index)
+  const moveItem = (displayIndex: number, direction: 'up' | 'down') => {
+    const currentOrder = [...sortedAndFilteredLevels];
+    const newDisplayIndex = direction === 'up' ? displayIndex - 1 : displayIndex + 1;
+    if (newDisplayIndex < 0 || newDisplayIndex >= currentOrder.length) return;
 
-    const [item] = newItems.splice(index, 1);
-    newItems.splice(newIndex, 0, item);
-    setPlatformerLevels(newItems);
+    // Get the items being swapped in display order
+    const itemToMove = currentOrder[displayIndex];
+    const itemToSwap = currentOrder[newDisplayIndex];
+    if (!itemToMove || !itemToSwap) return;
+    
+    // Find and swap in original platformerLevels array
+    const newItems = [...platformerLevels];
+    const fromIdx = newItems.findIndex(l => l.id === itemToMove.id);
+    const toIdx = newItems.findIndex(l => l.id === itemToSwap.id);
+    
+    if (fromIdx !== -1 && toIdx !== -1) {
+      const [item] = newItems.splice(fromIdx, 1);
+      newItems.splice(toIdx, 0, item);
+      setPlatformerLevels(newItems);
+    }
   };
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
 
-      // Update each level with its new HKGD rank
-      const updates = platformerLevels.map((level, index) => {
-        const newHKGDRank = platformerLevels.length - index; // Higher rank = harder
+      // Always use the CURRENT DISPLAY order for saving ranks
+      // Rank 1 = hardest = top of the list
+      const updates = sortedAndFilteredLevels.map((level, index) => {
+        const newHKGDRank = sortedAndFilteredLevels.length - index;
         return api.updatePlatformerLevel(level.id, {
           ...level,
           hkgdRank: newHKGDRank
@@ -132,7 +146,6 @@ export function DragPlatformer() {
 
       alert('Platformer ranking saved successfully!');
       
-      // Close the window after saving
       setTimeout(() => {
         window.close();
       }, 1000);
@@ -223,7 +236,7 @@ export function DragPlatformer() {
                   size="icon"
                   className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={(e) => { e.stopPropagation(); moveItem(index, 'down'); }}
-                  disabled={index === platformerLevels.length - 1}
+                  disabled={index === sortedAndFilteredLevels.length - 1}
                 >
                   <ArrowDown className="w-3 h-3" />
                 </Button>
