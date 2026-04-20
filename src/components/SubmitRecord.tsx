@@ -284,26 +284,42 @@ if (demonListType === 'platformer') {
         }
 
         // Filter for platformer only
-        const platformerResult = gdbResults.find((l: any) => l.platformer === true);
-        if (!platformerResult) {
+        const platformerResults = gdbResults.filter((l: any) => l.platformer === true);
+
+        if (platformerResults.length === 0) {
           throw new Error('No platformer levels found with that name');
         }
 
-        setSelectedLevelData({
-          id: parseInt(platformerResult.id),
-          name: platformerResult.name,
-          position: 0,
-          verifier: undefined,
-          publisher: { id: 0, name: platformerResult.author || 'Unknown', banned: false },
-          level_id: parseInt(platformerResult.id),
-          song: platformerResult.songName ? {
-            id: parseInt(platformerResult.customSong || '0'),
-            name: platformerResult.songName,
-            author: platformerResult.songAuthor || ''
-          } : undefined,
-          tags: ['Platformer']
-        });
-        setSelectedLevelId(platformerResult.id.toString());
+        // If only one result, select it directly
+        if (platformerResults.length === 1) {
+          const level = platformerResults[0];
+          setSelectedLevelData({
+            id: parseInt(level.id),
+            name: level.name,
+            position: 0,
+            verifier: undefined,
+            publisher: { id: 0, name: level.author || 'Unknown', banned: false },
+            level_id: parseInt(level.id),
+            song: level.songName ? {
+              id: parseInt(level.customSong || '0'),
+              name: level.songName,
+              author: level.songAuthor || ''
+            } : undefined,
+            tags: ['Platformer']
+          });
+          setSelectedLevelId(level.id.toString());
+          return;
+        }
+
+        // Show search results for user to choose
+        const formattedResults = platformerResults.map((l: any) => ({
+          level_id: parseInt(l.id),
+          name: l.name,
+          author: l.author,
+          difficulty: l.difficulty,
+          length: l.length
+        }));
+        setSearchResults(formattedResults);
         return;
       } else {
         // Handle classic extreme demons using AREDL API
