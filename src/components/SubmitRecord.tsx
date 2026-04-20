@@ -232,9 +232,9 @@ export function SubmitRecord({ levels, onSubmit, onClose }: SubmitRecordProps) {
       const isNumeric = /^\d+$/.test(searchTerm);
       
 if (demonListType === 'platformer') {
-        // Use our API proxy for GDBrowser
+        // Use external API - NO local database
         if (isNumeric) {
-          // Fetch from GDBrowser via our API proxy
+          // Fetch from API proxy
           const gdbResponse = await fetch(`${API_BASE_URL}/gdbrowser/level/${searchTerm}`, {
             signal: AbortSignal.timeout(10000)
           });
@@ -243,25 +243,28 @@ if (demonListType === 'platformer') {
           }
           const gdbData = await gdbResponse.json();
 
-          if (!gdbData.name) {
+          // Handle both API response formats
+          const levelName = gdbData.cache_level_name || gdbData.name;
+          if (!levelName) {
             throw new Error('Level data not available');
           }
 
-          // Verify it's a platformer level
-          if (!gdbData.platformer) {
+          // Verify it's a platformer level (check cache_length = 5 or platformer field)
+          const isPlatformer = gdbData.platformer === true || gdbData.cache_length === 5;
+          if (!isPlatformer) {
             throw new Error('Level is not a platformer level');
           }
 
           setSelectedLevelData({
-            id: parseInt(gdbData.id),
-            name: gdbData.name,
+            id: parseInt(gdbData.online_id || gdbData.id),
+            name: levelName,
             position: 0,
             verifier: undefined,
-            publisher: { id: 0, name: gdbData.author || 'Unknown', banned: false },
-            level_id: parseInt(gdbData.id),
-            song: gdbData.songName ? {
-              id: parseInt(gdbData.customSong || '0'),
-              name: gdbData.songName,
+            publisher: { id: 0, name: gdbData.cache_username || gdbData.author || 'Unknown', banned: false },
+            level_id: parseInt(gdbData.online_id || gdbData.id),
+            song: gdbData.cache_song_id ? {
+              id: parseInt(gdbData.cache_song_id),
+              name: gdbData.songName || '',
               author: gdbData.songAuthor || ''
             } : undefined,
             tags: ['Platformer']
@@ -270,54 +273,61 @@ if (demonListType === 'platformer') {
           return;
         }
 
-        // Search by name via GDBrowser
+        // Search by name
         const gdbResponse = await fetch(`${API_BASE_URL}/gdbrowser/search?q=${encodeURIComponent(searchTerm)}`, {
           signal: AbortSignal.timeout(10000)
         });
-        if (!gdbResponse.ok) {
-          throw new Error('Platformer level not found');
+        
+        let gdbResults = [];
+        try {
+          const data = await gdbResponse.json();
+          // Handle both response formats
+          gdbResults = Array.isArray(data) ? data : (data.hits || []);
+        } catch (e) {
+          gdbResults = [];
         }
-        const gdbResults = await gdbResponse.json();
 
         if (!gdbResults.length) {
-          throw new Error('No platformer levels found');
+          throw new Error('No platformer levels found - try searching by level ID instead');
         }
 
-        // Filter for platformer only
-        const platformerResults = gdbResults.filter((l: any) => l.platformer === true);
+        // Filter for platformer only (cache_length = 5 means platformer)
+        const platformerResults = gdbResults.filter((l: any) => 
+          l.platformer === true || l.cache_length === 5
+        );
 
         if (platformerResults.length === 0) {
-          throw new Error('No platformer levels found with that name');
+          throw new Error('No platformer levels found with that name - try searching by level ID');
         }
 
         // If only one result, select it directly
         if (platformerResults.length === 1) {
           const level = platformerResults[0];
           setSelectedLevelData({
-            id: parseInt(level.id),
-            name: level.name,
+            id: parseInt(level.online_id || level.id),
+            name: level.cache_level_name || level.name,
             position: 0,
             verifier: undefined,
-            publisher: { id: 0, name: level.author || 'Unknown', banned: false },
-            level_id: parseInt(level.id),
-            song: level.songName ? {
-              id: parseInt(level.customSong || '0'),
-              name: level.songName,
+            publisher: { id: 0, name: level.cache_username || level.author || 'Unknown', banned: false },
+            level_id: parseInt(level.online_id || level.id),
+            song: level.cache_song_id ? {
+              id: parseInt(level.cache_song_id),
+              name: level.songName || '',
               author: level.songAuthor || ''
             } : undefined,
             tags: ['Platformer']
           });
-          setSelectedLevelId(level.id.toString());
+          setSelectedLevelId((level.online_id || level.id).toString());
           return;
         }
 
-        // Show search results for user to choose
+        // Show search results
         const formattedResults = platformerResults.map((l: any) => ({
-          level_id: parseInt(l.id),
-          name: l.name,
-          author: l.author,
-          difficulty: l.difficulty,
-          length: l.length
+          level_id: parseInt(l.online_id || l.id),
+          name: l.cache_level_name || l.name,
+          author: l.cache_username || l.author,
+          difficulty: l.cache_filter_difficulty || l.difficulty,
+          length: l.cache_length || l.length
         }));
         setSearchResults(formattedResults);
         return;
