@@ -264,8 +264,8 @@ if (demonListType === 'platformer') {
             level_id: parseInt(gdbData.online_id || gdbData.id),
             song: gdbData.cache_song_id ? {
               id: parseInt(gdbData.cache_song_id),
-              name: gdbData.songName || '',
-              author: gdbData.songAuthor || ''
+              name: '',
+              author: ''
             } : undefined,
             tags: ['Platformer']
           });
@@ -312,8 +312,8 @@ if (demonListType === 'platformer') {
             level_id: parseInt(level.online_id || level.id),
             song: level.cache_song_id ? {
               id: parseInt(level.cache_song_id),
-              name: level.songName || '',
-              author: level.songAuthor || ''
+              name: '',
+              author: ''
             } : undefined,
             tags: ['Platformer']
           });
@@ -322,12 +322,14 @@ if (demonListType === 'platformer') {
         }
 
         // Show search results
-        const formattedResults = platformerResults.map((l: any) => ({
+        const formattedResults: AREDLLevelData[] = platformerResults.map((l: any) => ({
+          id: parseInt(l.online_id || l.id),
           level_id: parseInt(l.online_id || l.id),
           name: l.cache_level_name || l.name,
-          author: l.cache_username || l.author,
-          difficulty: l.cache_filter_difficulty || l.difficulty,
-          length: l.cache_length || l.length
+          position: 0,
+          publisher: { id: 0, name: l.cache_username || l.author || 'Unknown', banned: false },
+          verifier: undefined,
+          tags: ['Platformer']
         }));
         setSearchResults(formattedResults);
         return;
