@@ -21,7 +21,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { api } from '@/lib/api';
+import { api, API_BASE_URL } from '@/lib/api';
 import type { Level, Record } from '@/types';
 
 interface AREDLLevelData {
@@ -959,7 +959,7 @@ if (demonListType === 'platformer') {
                                 <Badge variant="secondary" className="text-xs">ID: {selectedLevelData.level_id}</Badge>
                                 <Badge variant="secondary" className="text-xs">
                                   {demonListType === 'platformer' 
-                                    ? `Pemonlist #${selectedLevelData.position}`
+                                    ? `Rank #${selectedLevelData.position}`
                                     : (selectedLevelData.position <= 150 ? `Pointercrate #${selectedLevelData.position}` : `AREDL #${selectedLevelData.position}`)
                                   }
                                 </Badge>
@@ -983,7 +983,7 @@ if (demonListType === 'platformer') {
                               <Badge variant="secondary" className="text-xs">ID: {level.level_id}</Badge>
                               <Badge variant="secondary" className="text-xs">
                                 {demonListType === 'platformer' 
-                                  ? `Pemonlist #${level.position}`
+                                  ? `Rank #${level.position}`
                                   : (level.position <= 150 ? `Pointercrate #${level.position}` : `AREDL #${level.position}`)
                                 }
                               </Badge>
@@ -1009,7 +1009,7 @@ if (demonListType === 'platformer') {
                           <Badge variant="secondary">
                             {(() => {
                               if (demonListType === 'platformer') {
-                                return `Pemonlist #${selectedLevelData.position}`;
+                                return `Rank #${selectedLevelData.position}`;
                             }
                             
                             // For classic demons
@@ -1085,7 +1085,7 @@ if (demonListType === 'platformer') {
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground">
                             {demonListType === 'platformer' 
-                              ? `Pemonlist #${level.rank}`
+                              ? `Rank #${level.rank}`
                               : (level.rank <= 150 ? `Pointercrate #${level.rank}` : `AREDL #${level.displayRank}`)
                             }
                           </span>

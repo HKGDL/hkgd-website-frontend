@@ -12,7 +12,7 @@ const getApiBaseUrl = () => {
   return '/api';
 };
 
-const API_BASE_URL = getApiBaseUrl();
+export const API_BASE_URL = getApiBaseUrl();
 const AREDL_API_BASE_URL = 'https://api.aredl.net/v2/api/aredl';
 
 // Helper function with timeout
