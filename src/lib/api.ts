@@ -366,20 +366,26 @@ export const api = {
 
   // Sync classic level details from History GD API
   syncLevelDetails: async () => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/levels/sync-details`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/levels/sync-details`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('hkgd_token')}`
+      },
+    }, 120000);
     if (!response.ok) throw new Error('Failed to sync level details');
     return response.json();
   },
 
   // Sync platformer level details from History GD API
   syncPlatformerLevelDetails: async () => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/platformer-levels/sync-details`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/platformer-levels/sync-details`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('hkgd_token')}`
+      },
+    }, 120000);
     if (!response.ok) throw new Error('Failed to sync platformer level details');
     return response.json();
   },
