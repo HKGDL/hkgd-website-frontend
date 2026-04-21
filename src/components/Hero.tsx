@@ -1,17 +1,17 @@
-import { Skull, Sparkles } from 'lucide-react';
-import type { WebsiteContent, Level, Member } from '@/types';
+import { Skull, Sparkles, List, Gamepad2 } from 'lucide-react';
+import type { WebsiteContent, Level } from '@/types';
+import { Button } from '@/components/ui/button';
 
 interface HeroProps {
   content: WebsiteContent['hero'];
   levels: Level[];
   platformerLevels: Level[];
+  onNavigate?: (page: 'home' | 'list' | 'platformer' | 'leaderboard' | 'mod') => void;
 }
 
-export function Hero({ content, levels, platformerLevels }: HeroProps) {
-  // Classic levels are all levels that are not platformer levels
+export function Hero({ content, levels, platformerLevels, onNavigate }: HeroProps) {
   const classicLevels = levels;
 
-  // Find hardest classic level for display
   const hardestClassic = classicLevels.length > 0
     ? classicLevels.sort((a, b) => (a.aredlRank || 9999) - (b.aredlRank || 9999))[0]
     : null;
@@ -90,6 +90,28 @@ export function Hero({ content, levels, platformerLevels }: HeroProps) {
               <div className="text-xs text-muted-foreground mt-1">Levels</div>
             </div>
           </div>
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-wrap justify-center gap-4 mt-8 sm:mt-12 animate-fadeIn" style={{ animationDelay: '0.7s' }}>
+          <Button 
+            onClick={() => onNavigate?.('list')}
+            size="lg"
+            className="bg-indigo-500 hover:bg-indigo-600 gap-2"
+          >
+            <List className="w-5 h-5" />
+            {content.ctaButton || 'View Demon List'}
+          </Button>
+          
+          <Button 
+            onClick={() => onNavigate?.('mod')}
+            size="lg"
+            variant="outline"
+            className="border-indigo-500/30 hover:border-indigo-500/60 gap-2"
+          >
+            <Gamepad2 className="w-5 h-5" />
+            View HKGD Geode Mod
+          </Button>
         </div>
       </div>
     </section>
