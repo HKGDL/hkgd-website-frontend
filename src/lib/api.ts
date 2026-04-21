@@ -364,6 +364,26 @@ export const api = {
     return response.json();
   },
 
+  // Sync classic level details from History GD API
+  syncLevelDetails: async () => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/levels/sync-details`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) throw new Error('Failed to sync level details');
+    return response.json();
+  },
+
+  // Sync platformer level details from History GD API
+  syncPlatformerLevelDetails: async () => {
+    const response = await authenticatedFetch(`${API_BASE_URL}/platformer-levels/sync-details`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) throw new Error('Failed to sync platformer level details');
+    return response.json();
+  },
+
   // Settings
   getSettings: async () => {
     const response = await fetchWithTimeout(`${API_BASE_URL}/settings`);

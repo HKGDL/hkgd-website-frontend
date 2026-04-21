@@ -1,17 +1,22 @@
 import { useState } from 'react';
-import { RefreshCw, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { RefreshCw, CheckCircle, XCircle, AlertTriangle, Image, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface AREDLSyncProps {
   onSync: () => Promise<void>;
+  onSyncDetails?: () => Promise<void>;
+  onSyncPlatformerDetails?: () => Promise<void>;
+  showDetailsSync?: boolean;
 }
 
 type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
 
-export function AREDLSync({ onSync }: AREDLSyncProps) {
+export function AREDLSync({ onSync, onSyncDetails, onSyncPlatformerDetails }: AREDLSyncProps) {
   const [status, setStatus] = useState<SyncStatus>('idle');
   const [message, setMessage] = useState('');
+  const [detailsStatus, setDetailsStatus] = useState<SyncStatus>('idle');
+  const [detailsMessage, setDetailsMessage] = useState('');
 
   const handleSync = async () => {
     setStatus('syncing');
@@ -29,6 +34,48 @@ export function AREDLSync({ onSync }: AREDLSyncProps) {
     } catch (error) {
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'Sync failed');
+    }
+  };
+
+  const handleSyncDetails = async () => {
+    if (!onSyncDetails) return;
+    
+    setDetailsStatus('syncing');
+    setDetailsMessage('Syncing level details...');
+    
+    try {
+      await onSyncDetails();
+      setDetailsStatus('success');
+      setDetailsMessage('Details synced for classic levels!');
+      
+      setTimeout(() => {
+        setDetailsStatus('idle');
+        setDetailsMessage('');
+      }, 3000);
+    } catch (error) {
+      setDetailsStatus('error');
+      setDetailsMessage(error instanceof Error ? error.message : 'Sync failed');
+    }
+  };
+
+  const handleSyncPlatformerDetails = async () => {
+    if (!onSyncPlatformerDetails) return;
+    
+    setDetailsStatus('syncing');
+    setDetailsMessage('Syncing platformer details...');
+    
+    try {
+      await onSyncPlatformerDetails();
+      setDetailsStatus('success');
+      setDetailsMessage('Details synced for platformer levels!');
+      
+      setTimeout(() => {
+        setDetailsStatus('idle');
+        setDetailsMessage('');
+      }, 3000);
+    } catch (error) {
+      setDetailsStatus('error');
+      setDetailsMessage(error instanceof Error ? error.message : 'Sync failed');
     }
   };
 
@@ -63,6 +110,54 @@ export function AREDLSync({ onSync }: AREDLSyncProps) {
           <AlertDescription>{message}</AlertDescription>
         </Alert>
       )}
+
+      {/* Level Details Sync */}
+      <div className="border-t border-border pt-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Image className="w-5 h-5" />
+          Level Details (History GD)
+        </h3>
+        
+        <div className="flex flex-wrap gap-3 mb-4">
+          <Button
+            onClick={handleSyncDetails}
+            disabled={detailsStatus === 'syncing' || !onSyncDetails}
+            variant="outline"
+            className="border-blue-500/30 hover:border-blue-500/60"
+          >
+            <Music className={`w-4 h-4 mr-2 ${detailsStatus === 'syncing' ? 'animate-spin' : ''}`} />
+            {detailsStatus === 'syncing' ? 'Syncing...' : 'Classic Levels'}
+          </Button>
+          
+          <Button
+            onClick={handleSyncPlatformerDetails}
+            disabled={detailsStatus === 'syncing' || !onSyncPlatformerDetails}
+            variant="outline"
+            className="border-purple-500/30 hover:border-purple-500/60"
+          >
+            <Music className={`w-4 h-4 mr-2 ${detailsStatus === 'syncing' ? 'animate-spin' : ''}`} />
+            {detailsStatus === 'syncing' ? 'Syncing...' : 'Platformer Levels'}
+          </Button>
+        </div>
+
+        <Alert>
+          <AlertTriangle className="w-4 h-4" />
+          <AlertDescription>
+            Sync level details fetches creator, thumbnail, and songs from History GD API for rated levels.
+          </AlertDescription>
+        </Alert>
+
+        {detailsMessage && (
+          <Alert variant={detailsStatus === 'success' ? 'default' : 'destructive'}>
+            {detailsStatus === 'success' ? (
+              <CheckCircle className="w-4 h-4" />
+            ) : detailsStatus === 'error' ? (
+              <XCircle className="w-4 h-4" />
+            ) : null}
+            <AlertDescription>{detailsMessage}</AlertDescription>
+          </Alert>
+        )}
+      </div>
 
       <div className="bg-muted/50 rounded-xl p-4 space-y-2 text-sm">
         <p className="font-medium text-foreground">What this does:</p>

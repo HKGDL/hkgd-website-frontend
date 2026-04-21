@@ -452,6 +452,38 @@ export function AdminCMSRefactored({
     }
   };
 
+  const handleSyncLevelDetails = async () => {
+    try {
+      const result = await api.syncLevelDetails();
+      
+      if (result.success) {
+        alert(`Classic levels details synced!\n\n${result.message}\n\n- Updated levels: ${result.updatedLevels || 0}`);
+        await onReloadData();
+      } else {
+        throw new Error(result.error || 'Sync failed');
+      }
+    } catch (error) {
+      console.error('Level details sync error:', error);
+      alert(`Sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleSyncPlatformerLevelDetails = async () => {
+    try {
+      const result = await api.syncPlatformerLevelDetails();
+      
+      if (result.success) {
+        alert(`Platformer levels details synced!\n\n${result.message}\n\n- Updated levels: ${result.updatedLevels || 0}`);
+        await onReloadData();
+      } else {
+        throw new Error(result.error || 'Sync failed');
+      }
+    } catch (error) {
+      console.error('Platformer level details sync error:', error);
+      alert(`Sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   const handleAddChangelogEntry = async (entry: ChangelogEntry) => {
     try {
       await api.addChangelog(entry);
@@ -764,7 +796,11 @@ export function AdminCMSRefactored({
             )}
 
             {activeTab === 'sync' && (
-              <AREDLSync onSync={handleSyncAREDL} />
+              <AREDLSync 
+                onSync={handleSyncAREDL}
+                onSyncDetails={handleSyncLevelDetails}
+                onSyncPlatformerDetails={handleSyncPlatformerLevelDetails}
+              />
             )}
 
             {activeTab === 'settings' && (
