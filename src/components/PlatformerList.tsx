@@ -13,7 +13,7 @@ interface PlatformerListProps {
   onReloadData?: () => Promise<void>;
 }
 
-export function PlatformerList({ platformerPage, levels }: PlatformerListProps) {
+export function PlatformerList({ platformerPage, levels, onReloadData }: PlatformerListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
