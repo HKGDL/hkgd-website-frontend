@@ -15,7 +15,7 @@ import {
   DragDropContext,
   Droppable,
   Draggable,
-  type DragEndHandler,
+  type DropResult,
 } from '@hello-pangea/dnd';
 
 interface DragPlatformerModalProps {
@@ -49,22 +49,22 @@ export function DragPlatformerModal({ open, onOpenChange, onSave }: DragPlatform
     }
   }, [open, loadLevels]);
 
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(platformerLevels);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    setPlatformerLevels(items);
+  };
+
   const filteredLevels = searchQuery
     ? platformerLevels.filter(l => 
         l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         l.creator?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : platformerLevels;
-
-  const handleDragEnd: DragEndHandler = (result) => {
-    if (!result.destination) return;
-    
-    const items = Array.from(filteredLevels);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    
-    setPlatformerLevels(items);
-  };
 
   const handleSave = async () => {
     try {
@@ -167,6 +167,9 @@ export function DragPlatformerModal({ open, onOpenChange, onSave }: DragPlatform
 }
 
 export function DragPlatformer() {
+  const [platformerLevels, setPlatformerLevels] = useState<Level[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     if (window.location.pathname === '/admin/drag-platformer') {
       const loadLevels = async () => {
@@ -182,25 +185,10 @@ export function DragPlatformer() {
     }
   }, []);
 
-  return <DragPlatformerModalWithState />;
-}
-
-function DragPlatformerModalWithState() {
-  const [platformerLevels, setPlatformerLevels] = useState<Level[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-
-  const filteredLevels = searchQuery
-    ? platformerLevels.filter(l => 
-        l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        l.creator?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : platformerLevels;
-
-  const handleDragEnd: DragEndHandler = (result) => {
+  const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     
-    const items = Array.from(filteredLevels);
+    const items = Array.from(platformerLevels);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     
@@ -210,8 +198,8 @@ function DragPlatformerModalWithState() {
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      const updates = filteredLevels.map((level, index) => {
-        const newRank = filteredLevels.length - index;
+      const updates = platformerLevels.map((level, index) => {
+        const newRank = platformerLevels.length - index;
         return api.updatePlatformerLevel(level.id, { ...level, hkgdRank: newRank });
       });
       await Promise.all(updates);
@@ -235,13 +223,6 @@ function DragPlatformerModalWithState() {
           </Button>
         </div>
 
-        <Input
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search..."
-          className="mb-4 bg-card"
-        />
-
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="platformer-list">
             {(provided) => (
@@ -250,7 +231,7 @@ function DragPlatformerModalWithState() {
                 ref={provided.innerRef}
                 className="space-y-2 mb-8"
               >
-                {filteredLevels.map((level, index) => (
+                {platformerLevels.map((level, index) => (
                   <Draggable key={level.id} draggableId={level.id} index={index}>
                     {(provided, snapshot) => (
                       <div
