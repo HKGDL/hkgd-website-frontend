@@ -518,34 +518,34 @@ export function AdminCMSRefactored({
     setShowAddLevel(true);
   };
 
-  const handleAddPlatformerLevel = async (pemonlistLevel: any) => {
+  const handleAddPlatformerLevel = async (levelData: any) => {
     try {
-      console.log('Adding platformer level:', pemonlistLevel);
+      console.log('Adding platformer level:', levelData);
 
       const newHKGDRank = platformerLevels.length + 1;
 
       // Fetch level details from History GD API
       let levelDetails: any = null;
       try {
-        levelDetails = await api.getLevelDetails(pemonlistLevel.level_id);
+        levelDetails = await api.getLevelDetails(levelData.level_id);
       } catch (err) {
         console.warn('Could not fetch level details, using search data:', err);
       }
 
       // Use fetched data or fallback to search data
-      const creator = levelDetails?.author || pemonlistLevel.publisher || 'Unknown';
+      const creator = levelDetails?.author || levelData.publisher || 'Unknown';
       const verifier = levelDetails?.verifier || 'Unknown';
-      const thumbnail = levelDetails?.thumbnail || levelDetails?.img || `https://levelthumbs.prevter.me/thumbnail/${pemonlistLevel.level_id}`;
+      const thumbnail = levelDetails?.thumbnail || levelDetails?.img || `https://levelthumbs.prevter.me/thumbnail/${levelData.level_id}`;
       const description = levelDetails?.description || '';
 
       const newLevel: Level = {
-        id: `plat-${pemonlistLevel.level_id}`,
+        id: `plat-${levelData.level_id}`,
         hkgdRank: newHKGDRank,
         aredlRank: null,
-        name: levelDetails?.name || pemonlistLevel.name,
+        name: levelDetails?.name || levelData.name,
         creator,
         verifier,
-        levelId: pemonlistLevel.level_id.toString(),
+        levelId: levelData.level_id.toString(),
         description,
         thumbnail,
         songId: levelDetails?.song?.id?.toString() || undefined,
@@ -579,7 +579,7 @@ export function AdminCMSRefactored({
           return `${d.getFullYear().toString().slice(-2)}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
         })(),
         levelName: newLevel.name,
-        levelId: pemonlistLevel.level_id.toString(),
+        levelId: levelData.level_id.toString(),
         change: 'added' as const,
         oldRank: null,
         newRank: newHKGDRank,

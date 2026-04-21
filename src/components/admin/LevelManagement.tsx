@@ -80,12 +80,12 @@ export function LevelManagement({
         <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
           <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
             <Search className="w-4 h-4 text-emerald-400" />
-            Add Platformer Level from Pemonlist
+            Add Platformer Level from History GD
           </h4>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search platformer levels by name or ID..."
+              placeholder="Search platformer levels by name..."
               value={platformerSearchQuery}
               onChange={(e) => onPlatformerSearchChange?.(e.target.value)}
               className="pl-10"
@@ -107,7 +107,7 @@ export function LevelManagement({
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="secondary" className="text-xs">ID: {level.level_id}</Badge>
                         <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs">
-                          Pemonlist #{level.position}
+                          ID: {level.level_id}
                         </Badge>
                       </div>
                     </div>
