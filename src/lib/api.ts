@@ -139,6 +139,13 @@ export const api = {
     return response.json();
   },
 
+  // Search levels via History GD API
+  searchLevels: async (query: string) => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/gdbrowser/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error('Failed to search levels');
+    return response.json();
+  },
+
   getPlatformerLevel: async (id: string) => {
     const response = await fetchWithTimeout(`${API_BASE_URL}/platformer-levels/${id}`);
     if (!response.ok) throw new Error('Failed to fetch platformer level');

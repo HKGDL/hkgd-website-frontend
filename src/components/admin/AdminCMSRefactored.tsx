@@ -94,7 +94,7 @@ export function AdminCMSRefactored({
     checkAuth();
   }, []);
 
-  // Fetch platformer levels for search
+  // Fetch platformer levels for search via History GD API
   useEffect(() => {
     const fetchPlatformerLevels = async () => {
       if (!platformerSearchQuery.trim()) {
@@ -104,18 +104,17 @@ export function AdminCMSRefactored({
 
       setIsSearchingPlatformer(true);
       try {
-        const platformerLevels = await api.getPlatformerDemons();
-        const query = platformerSearchQuery.toLowerCase();
-
-        // Filter levels by name or ID
-        const filtered = platformerLevels.filter((l: any) =>
-          l.name.toLowerCase().includes(query) ||
-          l.level_id.toString().includes(query)
-        ).slice(0, 20); // Limit to 20 results
+        // Use History GD API for searching
+        const results = await api.searchLevels(platformerSearchQuery);
+        
+        // Filter for platformer levels (cache_length = 5 = platformer)
+        const filtered = results.filter((l: any) =>
+          l.cache_length === 5
+        ).slice(0, 20);
 
         setPlatformerSearchResults(filtered);
       } catch (err) {
-        console.error('Failed to fetch platformer levels:', err);
+        console.error('Failed to search platformer levels:', err);
         setPlatformerSearchResults([]);
       } finally {
         setIsSearchingPlatformer(false);
@@ -727,6 +726,7 @@ export function AdminCMSRefactored({
                 onPlatformerSearchChange={setPlatformerSearchQuery}
                 platformerSearchResults={platformerSearchResults}
                 isSearchingPlatformer={isSearchingPlatformer}
+                onReloadData={onReloadData}
               />
             )}
 

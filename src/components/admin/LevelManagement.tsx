@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Search, Plus, Edit3, Trash2, Crown } from 'lucide-react';
+import { Search, Plus, Edit3, Trash2, Crown, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Level } from '@/types';
+import { DragPlatformerModal } from './DragPlatformer';
 
 interface LevelManagementProps {
   levels: Level[];
@@ -18,6 +19,7 @@ interface LevelManagementProps {
   onPlatformerSearchChange?: (query: string) => void;
   platformerSearchResults?: any[];
   isSearchingPlatformer?: boolean;
+  onReloadData?: () => Promise<void>;
 }
 
 export function LevelManagement({
@@ -32,8 +34,10 @@ export function LevelManagement({
   onPlatformerSearchChange,
   platformerSearchResults = [],
   isSearchingPlatformer = false,
+  onReloadData,
 }: LevelManagementProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isDragModalOpen, setIsDragModalOpen] = useState(false);
 
   const filteredLevels = levels.filter(level =>
     level.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -48,6 +52,12 @@ export function LevelManagement({
           {listType === 'classic' ? 'Classic Levels' : 'Platformer Levels'}
         </h3>
         <div className="flex items-center gap-2">
+          {listType === 'platformer' && (
+            <Button onClick={() => setIsDragModalOpen(true)} size="sm" variant="outline" className="border-purple-500/30 hover:border-purple-500/60">
+              <GripVertical className="w-4 h-4 mr-2" />
+              Reorder
+            </Button>
+          )}
           <Button onClick={onAddLevel} size="sm" className={listType === 'classic' ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-emerald-500 hover:bg-emerald-600'}>
             <Plus className="w-4 h-4 mr-2" />
             Add Level
@@ -194,6 +204,14 @@ export function LevelManagement({
       <div className="text-sm text-muted-foreground">
         Showing {filteredLevels.length} of {levels.length} levels
       </div>
+
+      {listType === 'platformer' && (
+        <DragPlatformerModal
+          open={isDragModalOpen}
+          onOpenChange={setIsDragModalOpen}
+          onSave={onReloadData}
+        />
+      )}
     </div>
   );
 }
