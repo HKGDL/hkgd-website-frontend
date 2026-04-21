@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Lock, Settings, Trophy, Users, User, List, RefreshCw, LogOut, History, ChevronDown, Sliders, Lightbulb, GripVertical } from 'lucide-react';
+import { X, Lock, Settings, Trophy, Users, User, List, RefreshCw, LogOut, History, ChevronDown, Sliders, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -62,9 +62,6 @@ export function AdminCMSRefactored({
   });
   const [difficultyModalSubmission, setDifficultyModalSubmission] = useState<PendingSubmission | null>(null);
   
-  // Drag-and-drop platformer ranking state
-  const [platformerLevelsForRanking, setPlatformerLevelsForRanking] = useState<Level[]>([]);
-
   // Platformer level search state
   const [platformerSearchQuery, setPlatformerSearchQuery] = useState('');
   const [platformerSearchResults, setPlatformerSearchResults] = useState<any[]>([]);
@@ -165,75 +162,6 @@ export function AdminCMSRefactored({
     }
   };
 
-  // Drag modal state (like Admin CMS pop-up style)
-  const [showDragModal, setShowDragModal] = useState(false);
-  const [draggedItem, setDraggedItem] = useState<Level | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [isSavingRanking, setIsSavingRanking] = useState(false);
-
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, level: Level) => {
-    setDraggedItem(level);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', level.id);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    e.preventDefault();
-    setDragOverIndex(index);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    e.preventDefault();
-    if (!draggedItem) return;
-    
-    const newItems = [...platformerLevelsForRanking];
-    const draggedIndex = newItems.findIndex(item => item.id === draggedItem.id);
-    
-    // Remove the dragged item
-    const [removedItem] = newItems.splice(draggedIndex, 1);
-    // Insert it at the new position
-    newItems.splice(index, 0, removedItem);
-    
-    setPlatformerLevelsForRanking(newItems);
-    setDraggedItem(null);
-    setDragOverIndex(null);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedItem(null);
-    setDragOverIndex(null);
-  };
-
-  const handleSavePlatformerRanking = async () => {
-    try {
-      setIsSavingRanking(true);
-      
-      // Update each level with its new HKGD rank
-      const updates = platformerLevelsForRanking.map((level, index) => {
-        const newHKGDRank = index + 1; // Easier levels have lower ranks (1), harder have higher (22)
-        return api.updatePlatformerLevel(level.id, {
-          ...level,
-          hkgdRank: newHKGDRank
-        });
-      });
-
-      await Promise.all(updates);
-      
-      // Refresh data after saving
-      const updatedLevels = await api.getPlatformerLevels();
-      onUpdatePlatformerLevels(updatedLevels);
-      setPlatformerLevelsForRanking(updatedLevels);
-      
-      alert('Platformer ranking saved successfully!');
-      setShowDragModal(false); // Close modal after saving
-    } catch (error) {
-      console.error('Failed to save platformer ranking:', error);
-      alert('Failed to save platformer ranking. Check console for details.');
-    } finally {
-      setIsSavingRanking(false);
-    }
-  };
-  
   const handlePlatformerDifficultySubmit = async (rank: number, levelData?: Partial<Level>) => {
     try {
       if (!difficultyModalSubmission) return;
@@ -312,20 +240,6 @@ export function AdminCMSRefactored({
       toast(`❌ Failed to approve platformer submission: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
-
-  // Initialize platformer levels for ranking when modal opens
-  useEffect(() => {
-    if (showDragModal) {
-      setPlatformerLevelsForRanking([...platformerLevels].sort((a, b) => b.hkgdRank - a.hkgdRank));
-    }
-  }, [showDragModal, platformerLevels]);
-
-  // Initialize platformer levels for ranking when tab is active
-  useEffect(() => {
-    if (activeTab === 'platformer-levels') {
-      setPlatformerLevelsForRanking([...platformerLevels].sort((a, b) => b.hkgdRank - a.hkgdRank));
-    }
-  }, [activeTab, platformerLevels]);
 
   const handleLogout = () => {
     api.logout();
@@ -813,7 +727,6 @@ export function AdminCMSRefactored({
                 onPlatformerSearchChange={setPlatformerSearchQuery}
                 platformerSearchResults={platformerSearchResults}
                 isSearchingPlatformer={isSearchingPlatformer}
-                onOpenDragModal={() => setShowDragModal(true)}
               />
             )}
 
@@ -876,91 +789,6 @@ export function AdminCMSRefactored({
         />
       )}
 
-      {/* Drag Modal - appears when showDragModal is true */}
-      {showDragModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-xl border border-border/50 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-border/50">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-foreground">🎛️ Drag Platformer Levels</h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowDragModal(false)}
-                  className="h-8 w-8"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                📝 Click and drag the grip handles (⠿) to reorder levels. Click "Save Ranking" when finished.
-              </p>
-            </div>
-
-            <div className="p-6">
-              <div className="space-y-3">
-                {platformerLevelsForRanking.map((level, index) => (
-                  <div
-                    key={level.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, level)}
-                    onDragOver={(e) => handleDragOver(e, index)}
-                    onDrop={(e) => handleDrop(e, index)}
-                    onDragEnd={handleDragEnd}
-                    className={css`
-                      flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50 
-                      hover:bg-muted/30 transition-colors group
-                      ${dragOverIndex === index ? 'border-purple-500 bg-purple-500/10' : ''}
-                      ${draggedItem?.id === level.id ? 'opacity-80' : ''}
-                    `}
-                  >
-                    <div
-                      className={css`
-                        cursor-grab
-                        touch-action: none
-                        user-select: none
-                        active:cursor-grabbing
-                      `}
-                    >
-                      <GripVertical className="w-5 h-5 text-purple-400 group-hover:text-purple-300" />
-                    </div>
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
-                      <span className="font-bold text-white text-sm">{index + 1}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-foreground truncate">{level.name}</div>
-                      <div className="text-sm text-muted-foreground truncate">
-                        by {level.creator} • ID: {level.levelId}
-                      </div>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {level.records.length} record{level.records.length !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-border/50 flex items-center justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowDragModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                onClick={handleSavePlatformerRanking}
-                disabled={isSavingRanking}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                {isSavingRanking ? 'Saving...' : 'Save Ranking'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-      
       {/* Platformer Difficulty Placement Modal */}
       {difficultyModalSubmission && (
         <PlatformerDifficultyModal

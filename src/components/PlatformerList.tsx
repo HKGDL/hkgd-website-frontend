@@ -1,19 +1,23 @@
 import { useState, useMemo } from 'react';
 import type { Level, WebsiteContent } from '@/types';
-import { Search, List, Grid3X3, Gamepad2, Trophy } from 'lucide-react';
+import { Search, List, Grid3X3, Gamepad2, Trophy, GripVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Button } from '@/components/ui/button';
 import { LevelDetail } from './LevelDetail';
+import { DragPlatformerModal } from './admin/DragPlatformer';
 
 interface PlatformerListProps {
   platformerPage: WebsiteContent['platformerPage'];
   levels: Level[];
+  onReloadData?: () => Promise<void>;
 }
 
 export function PlatformerList({ platformerPage, levels }: PlatformerListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
+  const [isDragModalOpen, setIsDragModalOpen] = useState(false);
 
   const platformerLevels = useMemo(() => {
     // Sort: rank 1 (easiest) first, highest rank (hardest) last
@@ -87,6 +91,16 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
                   <List className="w-4 h-4" />
                 </ToggleGroupItem>
               </ToggleGroup>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsDragModalOpen(true)}
+                className="gap-2 border-purple-500/30 hover:border-purple-500/60"
+              >
+                <GripVertical className="w-4 h-4" />
+                <span className="hidden sm:inline">Reorder</span>
+              </Button>
             </div>
           </div>
         </div>
@@ -257,6 +271,13 @@ export function PlatformerList({ platformerPage, levels }: PlatformerListProps) 
           onClose={() => setSelectedLevel(null)}
         />
       )}
+
+      {/* Drag and Drop Reorder Modal */}
+      <DragPlatformerModal
+        open={isDragModalOpen}
+        onOpenChange={setIsDragModalOpen}
+        onSave={onReloadData}
+      />
     </div>
   );
 }

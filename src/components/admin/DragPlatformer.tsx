@@ -1,29 +1,53 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { X, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { api } from '@/lib/api';
 import type { Level } from '@/types';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  type DragEndHandler,
+} from '@hello-pangea/dnd';
 
-export function DragPlatformer() {
+interface DragPlatformerModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSave?: () => void;
+}
+
+export function DragPlatformerModal({ open, onOpenChange, onSave }: DragPlatformerModalProps) {
   const [platformerLevels, setPlatformerLevels] = useState<Level[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [dragIdx, setDragIdx] = useState<number | null>(null);
-  const dragItemRef = useRef<Level | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadLevels = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const levels = await api.getPlatformerLevels();
+      const sorted = [...levels].sort((a, b) => (a.hkgdRank || 0) - (b.hkgdRank || 0));
+      setPlatformerLevels(sorted);
+    } catch (error) {
+      console.error('Failed to load:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const loadLevels = async () => {
-      try {
-        const levels = await api.getPlatformerLevels();
-        const sorted = [...levels].sort((a, b) => (b.hkgdRank || 0) - (a.hkgdRank || 0));
-        setPlatformerLevels(sorted);
-      } catch (error) {
-        console.error('Failed to load:', error);
-      }
-    };
-    loadLevels();
-  }, []);
+    if (open) {
+      loadLevels();
+    }
+  }, [open, loadLevels]);
 
   const filteredLevels = searchQuery
     ? platformerLevels.filter(l => 
@@ -32,51 +56,162 @@ export function DragPlatformer() {
       )
     : platformerLevels;
 
-  // Button move
-  const moveItem = (index: number, direction: 'up' | 'down') => {
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= platformerLevels.length) return;
+  const handleDragEnd: DragEndHandler = (result) => {
+    if (!result.destination) return;
     
-    const newItems = [...platformerLevels];
-    const [item] = newItems.splice(index, 1);
-    newItems.splice(newIndex, 0, item);
-    setPlatformerLevels(newItems);
-  };
-
-  // Drag handlers
-  const handleDragStart = (e: React.DragEvent, level: Level, index: number) => {
-    dragItemRef.current = level;
-    setDragIdx(index);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (dragIdx === null || dragIdx === index) return;
+    const items = Array.from(filteredLevels);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
     
-    const newItems = [...platformerLevels];
-    const dragItem = dragItemRef.current;
-    if (!dragItem) return;
-    
-    const oldIdx = newItems.findIndex(l => l.id === dragItem.id);
-    if (oldIdx === -1) return;
-    
-    const [item] = newItems.splice(oldIdx, 1);
-    newItems.splice(index, 0, item);
-    setPlatformerLevels(newItems);
-    setDragIdx(index);
-  };
-
-  const handleDragEnd = () => {
-    dragItemRef.current = null;
-    setDragIdx(null);
+    setPlatformerLevels(items);
   };
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      const updates = platformerLevels.map((level, index) => {
-        const newRank = platformerLevels.length - index;
+      const updates = filteredLevels.map((level, index) => {
+        const newRank = index + 1;
+        return api.updatePlatformerLevel(level.id, { ...level, hkgdRank: newRank });
+      });
+      await Promise.all(updates);
+      onSave?.();
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Save failed:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[80vh]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <GripVertical className="w-5 h-5" />
+            Reorder Platformer Difficulty
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="my-4">
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search levels..."
+            className="mb-4"
+          />
+
+          {isLoading ? (
+            <div className="text-center py-8 text-muted-foreground">Loading...</div>
+          ) : filteredLevels.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">No platformer levels found</div>
+          ) : (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="platformer-list">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-2 max-h-[50vh] overflow-y-auto"
+                  >
+                    {filteredLevels.map((level, index) => (
+                      <Draggable key={level.id} draggableId={level.id} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                              snapshot.isDragging
+                                ? 'bg-purple-500/20 border-purple-500 shadow-lg'
+                                : 'bg-card border-border hover:border-border/80'
+                            }`}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center shrink-0">
+                              <span className="font-bold text-white text-sm">{index + 1}</span>
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium truncate">{level.name}</div>
+                              <div className="text-xs text-muted-foreground truncate">
+                                by {level.creator}
+                              </div>
+                            </div>
+
+                            <div className="shrink-0 text-xs text-muted-foreground">
+                              HKGD #{level.hkgdRank}
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save Order'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function DragPlatformer() {
+  useEffect(() => {
+    if (window.location.pathname === '/admin/drag-platformer') {
+      const loadLevels = async () => {
+        try {
+          const levels = await api.getPlatformerLevels();
+          const sorted = [...levels].sort((a, b) => (b.hkgdRank || 0) - (a.hkgdRank || 0));
+          setPlatformerLevels(sorted);
+        } catch (error) {
+          console.error('Failed to load:', error);
+        }
+      };
+      loadLevels();
+    }
+  }, []);
+
+  return <DragPlatformerModalWithState />;
+}
+
+function DragPlatformerModalWithState() {
+  const [platformerLevels, setPlatformerLevels] = useState<Level[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const filteredLevels = searchQuery
+    ? platformerLevels.filter(l => 
+        l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        l.creator?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : platformerLevels;
+
+  const handleDragEnd: DragEndHandler = (result) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(filteredLevels);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    setPlatformerLevels(items);
+  };
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      const updates = filteredLevels.map((level, index) => {
+        const newRank = filteredLevels.length - index;
         return api.updatePlatformerLevel(level.id, { ...level, hkgdRank: newRank });
       });
       await Promise.all(updates);
@@ -107,50 +242,44 @@ export function DragPlatformer() {
           className="mb-4 bg-card"
         />
 
-        <div className="space-y-2 mb-8">
-          {filteredLevels.map((level, index) => (
-            <div
-              key={level.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, level, index)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragEnd={handleDragEnd}
-              className={`flex items-center gap-3 p-3 rounded-lg bg-card border border-border/50 cursor-move ${
-                dragIdx === index ? 'opacity-50' : ''
-              }`}
-            >
-              <GripVertical className="w-4 h-4 text-muted-foreground" />
-              
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => moveItem(index, 'up')}
-                disabled={index === 0}
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="platformer-list">
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="space-y-2 mb-8"
               >
-                <ArrowUp className="w-3 h-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => moveItem(index, 'down')}
-                disabled={index === filteredLevels.length - 1}
-              >
-                <ArrowDown className="w-3 h-3" />
-              </Button>
-              
-              <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center">
-                <span className="font-bold text-white text-sm">{index + 1}</span>
+                {filteredLevels.map((level, index) => (
+                  <Draggable key={level.id} draggableId={level.id} index={index}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                          snapshot.isDragging
+                            ? 'bg-purple-500/20 border-purple-500'
+                            : 'bg-card border-border'
+                        }`}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center">
+                          <span className="font-bold text-white text-sm">{index + 1}</span>
+                        </div>
+                        
+                        <div className="flex-1">
+                          <div className="font-medium">{level.name}</div>
+                          <div className="text-xs text-muted-foreground">by {level.creator}</div>
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
               </div>
-              
-              <div className="flex-1">
-                <div className="font-medium">{level.name}</div>
-                <div className="text-xs text-muted-foreground">by {level.creator}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
         <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={() => window.close()}>Cancel</Button>

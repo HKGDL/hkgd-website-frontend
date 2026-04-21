@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, Edit3, Trash2, Crown, GripVertical } from 'lucide-react';
+import { Search, Plus, Edit3, Trash2, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,6 @@ interface LevelManagementProps {
   onPlatformerSearchChange?: (query: string) => void;
   platformerSearchResults?: any[];
   isSearchingPlatformer?: boolean;
-  onOpenDragModal?: () => void;
 }
 
 export function LevelManagement({
@@ -33,7 +32,6 @@ export function LevelManagement({
   onPlatformerSearchChange,
   platformerSearchResults = [],
   isSearchingPlatformer = false,
-  onOpenDragModal = () => {},
 }: LevelManagementProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -54,16 +52,6 @@ export function LevelManagement({
             <Plus className="w-4 h-4 mr-2" />
             Add Level
           </Button>
-          {listType === 'platformer' && (
-            <Button
-              onClick={() => onOpenDragModal()}
-              size="sm"
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              <GripVertical className="w-4 h-4 mr-2" />
-              Open Drag Modal
-            </Button>
-          )}
         </div>
       </div>
 
