@@ -492,20 +492,32 @@ export function AdminCMSRefactored({
 
       const newHKGDRank = platformerLevels.length + 1;
 
+      // Fetch level details from History GD API
+      let levelDetails: any = null;
+      try {
+        levelDetails = await api.getLevelDetails(pemonlistLevel.level_id);
+      } catch (err) {
+        console.warn('Could not fetch level details, using search data:', err);
+      }
+
+      // Use fetched data or fallback to search data
+      const creator = levelDetails?.author || pemonlistLevel.publisher || 'Unknown';
+      const verifier = levelDetails?.verifier || 'Unknown';
+      const thumbnail = levelDetails?.thumbnail || levelDetails?.img || `https://levelthumbs.prevter.me/thumbnail/${pemonlistLevel.level_id}`;
+      const description = levelDetails?.description || '';
+
       const newLevel: Level = {
         id: `plat-${pemonlistLevel.level_id}`,
         hkgdRank: newHKGDRank,
         aredlRank: null,
-        // Removed pemonlistRank - using manual ranking only
-        // pemonlistRank: pemonlistLevel.position,
-        name: pemonlistLevel.name,
-        creator: pemonlistLevel.publisher || 'Unknown',
-        verifier: pemonlistLevel.verifier || 'Unknown',
+        name: levelDetails?.name || pemonlistLevel.name,
+        creator,
+        verifier,
         levelId: pemonlistLevel.level_id.toString(),
-        description: '',
-        thumbnail: `https://levelthumbs.prevter.me/thumbnail/${pemonlistLevel.level_id}`,
-        songId: undefined,
-        songName: undefined,
+        description,
+        thumbnail,
+        songId: levelDetails?.song?.id?.toString() || undefined,
+        songName: levelDetails?.song?.name || undefined,
         tags: ['Platformer'],
         dateAdded: new Date().toISOString(),
         records: [],
@@ -519,13 +531,13 @@ export function AdminCMSRefactored({
       const levelAbove = platformerLevels[newHKGDRank - 2];
       const levelBelow = platformerLevels[newHKGDRank - 1];
       
-      let description = `${newLevel.name} was added at rank #${newHKGDRank}`;
+      let changelogDesc = `${newLevel.name} was added at rank #${newHKGDRank}`;
       if (levelAbove && levelBelow) {
-        description += `, above ${levelBelow.name} and below ${levelAbove.name}`;
+        changelogDesc += `, above ${levelBelow.name} and below ${levelAbove.name}`;
       } else if (levelAbove) {
-        description += `, below ${levelAbove.name}`;
+        changelogDesc += `, below ${levelAbove.name}`;
       } else if (levelBelow) {
-        description += `, above ${levelBelow.name}`;
+        changelogDesc += `, above ${levelBelow.name}`;
       }
 
       const changelogEntry = {
@@ -539,14 +551,14 @@ export function AdminCMSRefactored({
         change: 'added' as const,
         oldRank: null,
         newRank: newHKGDRank,
-        description: description,
+        description: changelogDesc,
         listType: 'platformer' as const,
       };
       await api.addChangelog(changelogEntry);
 
       await onReloadData();
 
-      alert(`Successfully added ${newLevel.name} (Pemonlist #${pemonlistLevel.position})!`);
+      alert(`Successfully added ${newLevel.name} (HKGD #${newHKGDRank})!`);
 
       setPlatformerSearchQuery('');
       setPlatformerSearchResults([]);

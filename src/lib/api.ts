@@ -146,6 +146,13 @@ export const api = {
     return response.json();
   },
 
+  // Get level details via History GD API
+  getLevelDetails: async (levelId: string) => {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/gdbrowser/level/${levelId}`);
+    if (!response.ok) throw new Error('Failed to fetch level details');
+    return response.json();
+  },
+
   getPlatformerLevel: async (id: string) => {
     const response = await fetchWithTimeout(`${API_BASE_URL}/platformer-levels/${id}`);
     if (!response.ok) throw new Error('Failed to fetch platformer level');
