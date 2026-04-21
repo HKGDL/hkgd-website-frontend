@@ -85,20 +85,21 @@ export function DragPlatformerModal({ open, onOpenChange, onSave }: DragPlatform
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh] sm:max-h-[80vh] p-3 sm:p-6">
+        <DialogHeader className="pb-3">
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <GripVertical className="w-5 h-5" />
-            Reorder Platformer Difficulty
+            <span className="hidden sm:inline">Reorder Platformer Difficulty</span>
+            <span className="sm:hidden">Reorder Difficulty</span>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="my-4">
+        <div className="flex flex-col gap-3">
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search levels..."
-            className="mb-4"
+            placeholder="Search..."
+            className="h-10 text-sm"
           />
 
           {isLoading ? (
@@ -112,7 +113,7 @@ export function DragPlatformerModal({ open, onOpenChange, onSave }: DragPlatform
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className="space-y-2 max-h-[50vh] overflow-y-auto"
+                    className="space-y-2 max-h-[50vh] sm:max-h-[55vh] overflow-y-auto -mx-2 px-2"
                   >
                     {filteredLevels.map((level, index) => (
                       <Draggable key={level.id} draggableId={level.id} index={index}>
@@ -121,25 +122,25 @@ export function DragPlatformerModal({ open, onOpenChange, onSave }: DragPlatform
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border transition-colors touch-manipulation ${
                               snapshot.isDragging
-                                ? 'bg-purple-500/20 border-purple-500 shadow-lg'
+                                ? 'bg-purple-500/30 border-purple-500 shadow-xl scale-[1.02]'
                                 : 'bg-card border-border hover:border-border/80'
                             }`}
                           >
-                            <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center shrink-0">
-                              <span className="font-bold text-white text-sm">{index + 1}</span>
+                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md sm:rounded-lg bg-purple-600 flex items-center justify-center shrink-0">
+                              <span className="font-bold text-white text-xs sm:text-sm">{index + 1}</span>
                             </div>
                             
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium truncate">{level.name}</div>
-                              <div className="text-xs text-muted-foreground truncate">
+                              <div className="font-medium text-sm sm:text-base truncate">{level.name}</div>
+                              <div className="text-[10px] sm:text-xs text-muted-foreground truncate">
                                 by {level.creator}
                               </div>
                             </div>
 
-                            <div className="shrink-0 text-xs text-muted-foreground">
-                              HKGD #{level.hkgdRank}
+                            <div className="shrink-0 text-[10px] sm:text-xs text-muted-foreground hidden xs:inline">
+                              #{level.hkgdRank}
                             </div>
                           </div>
                         )}
@@ -153,12 +154,20 @@ export function DragPlatformerModal({ open, onOpenChange, onSave }: DragPlatform
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="flex-row gap-2 pt-3">
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            className="flex-1 h-10 text-sm"
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Save Order'}
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving}
+            className="flex-1 h-10 text-sm"
+          >
+            {isSaving ? 'Saving...' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>

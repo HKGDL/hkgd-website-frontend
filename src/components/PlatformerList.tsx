@@ -96,7 +96,7 @@ export function PlatformerList({ platformerPage, levels, onReloadData }: Platfor
                 variant="outline"
                 size="sm"
                 onClick={() => setIsDragModalOpen(true)}
-                className="gap-2 border-purple-500/30 hover:border-purple-500/60"
+                className="gap-1.5 sm:gap-2 border-purple-500/30 hover:border-purple-500/60 h-10 px-3"
               >
                 <GripVertical className="w-4 h-4" />
                 <span className="hidden sm:inline">Reorder</span>
