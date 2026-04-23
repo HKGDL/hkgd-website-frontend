@@ -2,13 +2,13 @@
 // Always use relative /api path since Vite proxies /api in dev
 // and production server serves both frontend and API from same origin
 const getApiBaseUrl = () => {
-  // Check for environment variable first
   const envApiUrl = import.meta.env.VITE_API_URL;
   if (envApiUrl) {
     return envApiUrl;
   }
-
-  // Always use relative path - works for both dev (via Vite proxy) and production
+  if (import.meta.env.PROD) {
+    return 'https://api.hkgdl.dpdns.org';
+  }
   return '/api';
 };
 

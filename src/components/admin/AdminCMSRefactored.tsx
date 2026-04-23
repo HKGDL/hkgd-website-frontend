@@ -662,8 +662,8 @@ export function AdminCMSRefactored({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-card rounded-2xl border border-border/50 overflow-hidden animate-fadeIn">
-        <div className="flex items-center justify-between p-6 border-b border-border/50">
+      <div className="relative w-full max-w-4xl h-[90vh] sm:max-h-[95vh] sm:h-auto bg-card rounded-2xl border border-border/50 overflow-hidden animate-fadeIn flex flex-col">
+        <div className="flex items-center justify-between p-3 sm:p-6 border-b border-border/50 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
               <Settings className="w-5 h-5 text-indigo-400" />
@@ -745,7 +745,7 @@ export function AdminCMSRefactored({
           </Select>
         </div>
 
-        <ScrollArea className="h-[calc(90vh-140px)]">
+        <ScrollArea className="flex-1 min-h-0">
           <div className="p-6">
             {activeTab === 'classic-levels' && (
               <LevelManagement

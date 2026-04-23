@@ -132,7 +132,7 @@ export function LevelManagement({
         </div>
       )}
 
-      <ScrollArea className="max-h-[500px] rounded-xl border border-border/50 bg-muted/30">
+      <ScrollArea className="h-[calc(100vh-320px)] sm:max-h-[500px] rounded-xl border border-border/50 bg-muted/30">
         <div className="p-4 space-y-3">
           {filteredLevels.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">

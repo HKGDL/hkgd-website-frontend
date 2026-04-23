@@ -281,7 +281,7 @@ export function AddLevelModal({ levels, onClose, onAdded }: AddLevelModalProps) 
         </div>
 
         {/* Content */}
-        <ScrollArea className="h-[calc(90vh-200px)]">
+        <ScrollArea className="flex-1 min-h-0">
           <div className="p-6">
             {mode === 'search' && (
               <div className="space-y-6">

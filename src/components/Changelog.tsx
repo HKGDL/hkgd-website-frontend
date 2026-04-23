@@ -4,16 +4,56 @@ import {
   Plus, 
   Minus,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  RefreshCw
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState, useEffect } from 'react';
 
 interface ChangelogProps {
   entries: ChangelogEntry[];
 }
 
+function getNextSyncInfo() {
+  const now = new Date();
+  const gmt8Offset = 8 * 60;
+  const localOffset = now.getTimezoneOffset();
+  const gmt8Time = new Date(now.getTime() + (gmt8Offset + localOffset) * 60000);
+  
+  const tomorrow = new Date(gmt8Time);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(12, 0, 0, 0);
+  
+  const nextSync = new Date(tomorrow.getTime() - (gmt8Offset + localOffset) * 60000);
+  const diffMs = nextSync.getTime() - now.getTime();
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  const today = new Date();
+  const gmt8Today = new Date(today.getTime() + (gmt8Offset + localOffset) * 60000);
+  gmt8Today.setHours(12, 0, 0, 0);
+  const todaySync = new Date(gmt8Today.getTime() - (gmt8Offset + localOffset) * 60000);
+  
+  const syncToday = gmt8Today <= today ? null : gmt8Today;
+  
+  return {
+    today: syncToday ? `${String(gmt8Today.getMonth() + 1).padStart(2, '0')}/${String(gmt8Today.getDate()).padStart(2, '0')}` : null,
+    next: `${hours}h ${minutes}m`
+  };
+}
+
 export function Changelog({ entries }: ChangelogProps) {
-  // Filter out AREDL sync entries and sort by date (newest first)
+  const [syncInfo, setSyncInfo] = useState(getNextSyncInfo());
+  
+  useEffect(() => {
+    const interval = setInterval(() => setSyncInfo(getNextSyncInfo()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  const aredlSyncEntry = entries.find(e => e.change === 'sync');
+  const recentSyncDate = aredlSyncEntry?.date;
+  
+  // Filter out AREDL sync entries for the main list and sort by date (newest first)
   const filteredEntries = entries.filter(entry => entry.change !== 'sync');
   const sortedEntries = [...filteredEntries].sort((a, b) => {
     // Parse date format: YY/MM/DD
@@ -112,6 +152,16 @@ export function Changelog({ entries }: ChangelogProps) {
           <p className="text-sm text-muted-foreground">Recent ranking updates</p>
         </div>
       </div>
+
+      {aredlSyncEntry && (
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+          <RefreshCw className="w-4 h-4 text-indigo-400" />
+          <span className="text-sm text-muted-foreground">
+            Sync with AREDL at 12:00 ({aredlSyncEntry.date})
+            {syncInfo.today ? `, next sync today at 12:00` : `, next sync in ${syncInfo.next}`}
+          </span>
+        </div>
+      )}
 
       <ScrollArea className="h-[400px] pr-4">
         <div className="space-y-3">
