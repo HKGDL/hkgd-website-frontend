@@ -204,7 +204,7 @@ export function LevelList({ levels, listPage, changelog }: LevelListProps) {
 
               {/* Changelog */}
               <div className="p-4 sm:p-6 rounded-xl bg-card border border-border/50">
-                <Changelog entries={changelog} />
+                <Changelog entries={changelog} levels={levels} />
               </div>
             </div>
           </div>
