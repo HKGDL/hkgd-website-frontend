@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { RefreshCw, CheckCircle, XCircle, AlertTriangle, Image, Music } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { RefreshCw, CheckCircle, XCircle, AlertTriangle, Image, Music, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -17,6 +17,30 @@ export function AREDLSync({ onSync, onSyncDetails, onSyncPlatformerDetails }: AR
   const [message, setMessage] = useState('');
   const [detailsStatus, setDetailsStatus] = useState<SyncStatus>('idle');
   const [detailsMessage, setDetailsMessage] = useState('');
+  const [timeToNextSync, setTimeToNextSync] = useState<string>('');
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const target = new Date();
+      
+      target.setUTCHours(4, 0, 0, 0);
+      if (now.getUTCHours() >= 4) {
+        target.setUTCDate(target.getUTCDate() + 1);
+      }
+      
+      const diff = target.getTime() - now.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      setTimeToNextSync(`${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSync = async () => {
     setStatus('syncing');
@@ -91,6 +115,12 @@ export function AREDLSync({ onSync, onSyncDetails, onSyncPlatformerDetails }: AR
           <RefreshCw className={`w-4 h-4 mr-2 ${status === 'syncing' ? 'animate-spin' : ''}`} />
           {status === 'syncing' ? 'Syncing...' : 'Sync Now'}
         </Button>
+      </div>
+
+      <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+        <Clock className="w-4 h-4" />
+        <span>Auto-sync at 12:00 PM (GMT+8) every day</span>
+        <span className="ml-auto font-mono text-indigo-400">{timeToNextSync}</span>
       </div>
 
       <Alert>
