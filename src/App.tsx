@@ -62,18 +62,25 @@ function App() {
   const loadAllData = async () => {
     try {
       setIsLoading(true);
-      const [levelsData, platformerData, changelogData, membersData, submissionsData] = await Promise.all([
+      const results = await Promise.allSettled([
         api.getLevels(),
         api.getPlatformerLevels(),
         api.getChangelog(),
         api.getMembers(),
         api.getPendingSubmissions(),
       ]);
-      setLevels(levelsData);
-      setPlatformerLevels(platformerData);
-      setChangelog(changelogData);
-      setMembers(membersData);
-      setPendingSubmissions(submissionsData);
+      
+      if (results[0].status === 'fulfilled') setLevels(results[0].value);
+      if (results[1].status === 'fulfilled') setPlatformerLevels(results[1].value);
+      if (results[2].status === 'fulfilled') setChangelog(results[2].value);
+      if (results[3].status === 'fulfilled') setMembers(results[3].value);
+      if (results[4].status === 'fulfilled') setPendingSubmissions(results[4].value);
+      
+      const failedCount = results.filter(r => r.status === 'rejected').length;
+      if (failedCount > 0) {
+        console.warn(`Failed to load ${failedCount} data sources, retrying...`);
+        setTimeout(loadAllData, 2000);
+      }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
